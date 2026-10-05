@@ -60,6 +60,7 @@ a.tile:active{animation:ripple .45s}
 .nban h2{padding-right:44px}
 .nban .sb{position:absolute;top:6px;right:6px}
 @keyframes pop{from{transform:scale(.96);opacity:0}}
+.vid.aud{aspect-ratio:auto;height:180px}
 .cardshot{margin:-20px auto 0;max-width:420px;position:relative;z-index:1;perspective:900px}
 .cardshot img{display:block;width:100%;height:auto;border-radius:4.5%;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .15s;box-shadow:0 14px 34px rgba(0,0,0,.4),0 0 28px rgba(224,138,30,.35)}
 
@@ -426,11 +427,32 @@ function FormRenderer(form) {
   sync(); return root;
 }
 
-function AudioPlayer(m) {
-  const box = el("div", "card player");
-  box.innerHTML = `<h2>🎧 ${esc(m.title)}</h2>`;
-  if (!m.src) { box.append(el("p", "empty", "Audio belum ditetapkan. Isi src dalam MEDIA.")); return box; }
-  const a = new Audio(m.src); a.preload = "none";
+/* ===== MEDIA: tukar pautan perkongsian apa sahaja kepada sumber yang boleh dibuka ===== */
+const EXT = { audio: /\.(mp3|m4a|wav|ogg|oga|aac|flac)$/i, video: /\.(mp4|webm|mov|m4v|ogv)$/i, image: /\.(jpe?g|png|gif|webp|svg|avif)$/i };
+const extType = p => Object.keys(EXT).find(k => EXT[k].test(p)) || null;
+function mediaSrc(raw, type) {
+  const s0 = String(raw || "").trim(); if (!s0) return null;
+  if (type === "link") return { kind: "link", url: s0 };
+  if (/^data:/i.test(s0)) return { kind: "file", url: s0, t: (s0.match(/^data:(audio|video|image)/i) || [])[1] || type };
+  if (!/^https?:\/\//i.test(s0)) return { kind: "file", url: s0, t: extType(s0.split("?")[0]) || type }; // laluan dalam repo, cth. media/lagu.mp3
+  let u; try { u = new URL(s0); } catch (e) { return { kind: "link", url: s0 }; }
+  const h = u.hostname.replace(/^www\./, ""), p = u.pathname; let id;
+  id = h === "youtu.be" ? p.slice(1).split("/")[0] : /(^|\.)youtube(-nocookie)?\.com$/.test(h) ? (u.searchParams.get("v") || (p.match(/^\/(?:embed|shorts|live|v)\/([\w-]{11})/) || [])[1]) : null;
+  if (id && /^[\w-]{11}$/.test(id)) return { kind: "frame", url: `https://www.youtube-nocookie.com/embed/${id}` };
+  if (h === "vimeo.com" || h === "player.vimeo.com") { id = (p.match(/(\d{6,})/) || [])[1]; if (id) return { kind: "frame", url: `https://player.vimeo.com/video/${id}` }; }
+  if (h === "drive.google.com") {
+    id = (p.match(/\/d\/([\w-]+)/) || [])[1] || u.searchParams.get("id");
+    if (id) return type === "image" ? { kind: "img", url: `https://drive.google.com/thumbnail?id=${id}&sz=w1600` } : { kind: "frame", url: `https://drive.google.com/file/d/${id}/preview`, audio: type === "audio" };
+  }
+  if (/(^|\.)dropbox\.com$/.test(h)) { u.searchParams.delete("dl"); u.searchParams.set("raw", "1"); return { kind: "file", url: u.toString(), t: extType(p) || type }; }
+  if (h === "dl.dropboxusercontent.com") return { kind: "file", url: s0, t: extType(p) || type };
+  if (h === "github.com") { const m = p.match(/^\/([^/]+)\/([^/]+)\/(?:blob|raw)\/(.+)$/); if (m) return { kind: "file", url: `https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}`, t: extType(m[3]) || type }; }
+  const t = extType(p); if (t) return { kind: "file", url: s0, t };
+  return { kind: "link", url: s0 }; // 4shared, OneDrive, MediaFire dll: dibuka sebagai pautan
+}
+function audioControls(url) {
+  const a = new Audio(url); a.preload = "none"; a.style.display = "none";
+  const box = el("div", "player");
   const row = el("div", "row", `<button type="button" aria-label="Main / Jeda">▶</button><input type="range" min="0" max="100" value="0" aria-label="Kemajuan audio">`);
   const vol = el("div", "row", `<span aria-hidden="true">🔊</span><input type="range" min="0" max="1" step="0.05" value="1" aria-label="Kelantangan">`);
   const [btn, prog] = [$("button", row), $("input", row)];
@@ -439,15 +461,27 @@ function AudioPlayer(m) {
   a.ontimeupdate = () => prog.value = a.duration ? a.currentTime / a.duration * 100 : 0;
   prog.oninput = () => { if (a.duration) a.currentTime = prog.value / 100 * a.duration; };
   $("input", vol).oninput = e => a.volume = e.target.value;
-  box.append(row, vol); box._stop = () => a.pause(); return box;
+  box.append(row, vol, a); return box;
 }
-function VideoPlayer(m) {
-  const box = el("div", "card"); box.innerHTML = `<h2>▶️ ${esc(m.title)}</h2>`;
-  if (!m.src) { box.append(el("p", "empty", "Video belum ditetapkan. Isi src dalam MEDIA.")); return box; }
-  const yt = m.src.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);
-  const w = el("div", "vid", yt ? `<iframe src="https://www.youtube-nocookie.com/embed/${yt[1]}" title="${esc(m.title)}" allowfullscreen loading="lazy"></iframe>` : `<video controls preload="metadata" src="${esc(m.src)}"></video>`);
-  box.append(w); return box;
+function mediaNode(r, m) {
+  if (r.kind === "file" && r.t === "audio") return audioControls(r.url);
+  const w = el("div");
+  if (r.kind === "file" && r.t === "video") w.innerHTML = `<div class="vid"><video controls playsinline preload="metadata" src="${esc(r.url)}"></video></div>`;
+  else if (r.kind === "img" || (r.kind === "file" && r.t === "image")) { w.append(el("img", "mimg")); const i = $("img", w); i.src = r.url; i.alt = m.alt || m.title; }
+  else if (r.kind === "frame") w.innerHTML = `<div class="vid${r.audio ? " aud" : ""}"><iframe src="${esc(r.url)}" title="${esc(m.title)}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
+  else w.innerHTML = `<p class="lead">Pautan ini dibuka di tab baharu.</p><a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Buka ↗</a>`;
+  if (r.kind !== "link") w.insertAdjacentHTML("beforeend", `<p class="hint"><a href="${esc(m.src)}" target="_blank" rel="noopener">Tidak dapat dimainkan? Buka pautan asal ↗</a></p>`);
+  return w;
 }
+function MediaCard(m, type, icon) {
+  const box = el("div", "card", `<h2>${icon} ${esc(m ? m.title : "")}</h2>`);
+  const r = m && mediaSrc(m.src, type);
+  if (!r) { box.append(el("p", "empty", "Sumber belum ditetapkan.")); return box; }
+  box.append(mediaNode(r, m)); return box;
+}
+const AudioPlayer = m => MediaCard(m, "audio", "🎧");
+const VideoPlayer = m => MediaCard(m, "video", "▶️");
+
 function FAQAccordion(menuId) {
   const items = visible(FAQ.filter(x => x.menuId === menuId));
   const box = el("div", "card acc");
@@ -467,7 +501,7 @@ function ContactCard(menuId) {
 const subReady = s => {
   if (s.status !== "active") return false;
   if (s.kind === "form") { const f = FORMS.find(x => x.id === s.ref), t = f && TEMPLATES.find(x => x.id === f.template); return !!(t && t.status === "active"); }
-  if (s.kind === "audio" || s.kind === "video" || s.kind === "image") { const m = MEDIA.find(x => x.id === s.ref); return !!(m && m.type === s.kind && m.src); }
+  if (s.kind === "audio" || s.kind === "video" || s.kind === "image" || s.kind === "link") { const m = MEDIA.find(x => x.id === s.ref); return !!(m && m.type === s.kind && m.src); }
   if (s.kind === "faq") return visible(FAQ.filter(x => x.menuId === s.menuId)).length > 0;
   if (s.kind === "contact") return visible(CONTACTS.filter(x => x.menuId === s.menuId)).length > 0;
   return false;
@@ -479,10 +513,11 @@ const okUrl = u => /^(https?:\/\/|#\/|tel:)/.test(u || "");
 const nKey = n => "n:" + n.id + ":" + n.updatedAt;
 const dismissed = n => { try { return localStorage.getItem(nKey(n)) === "1"; } catch (e) { return false; } };
 const dismiss = n => { try { localStorage.setItem(nKey(n), "1"); } catch (e) {} };
+const noticeImg = m => { const r = m && mediaSrc(m.src, "image"); return r && (r.kind === "img" || (r.kind === "file" && r.t === "image")) ? r.url : ""; };
 const noticeBody = n => {
   const m = MEDIA.find(x => x.id === n.mediaId && x.type === "image" && x.src);
   const ext = /^https?:/.test(n.btnUrl || "") ? ' target="_blank" rel="noopener"' : "";
-  return `${m ? `<img src="${esc(m.src)}" alt="${esc(m.alt || n.title)}">` : ""}<h2>${esc(n.title)}</h2>${n.message ? `<p>${esc(n.message).replace(/\n/g, "<br>")}</p>` : ""}${okUrl(n.btnUrl) ? `<a class="btn" href="${esc(n.btnUrl)}"${ext}>${esc(n.btnText || "Lihat maklumat")}</a>` : ""}`;
+  return `${noticeImg(m) ? `<img src="${esc(noticeImg(m))}" alt="${esc(m.alt || n.title)}">` : ""}<h2>${esc(n.title)}</h2>${n.message ? `<p>${esc(n.message).replace(/\n/g, "<br>")}</p>` : ""}${okUrl(n.btnUrl) ? `<a class="btn" href="${esc(n.btnUrl)}"${ext}>${esc(n.btnText || "Lihat maklumat")}</a>` : ""}`;
 };
 function showNotice(n, preview) {
   document.querySelectorAll(".ov").forEach(x => x.remove());
@@ -502,11 +537,8 @@ function applyNotices(menuId, body) {
   list.filter(n => n.display === "banner" && !dismissed(n)).reverse().forEach(n => body.prepend(Banner(n)));
   const p = list.find(n => n.display !== "banner" && !dismissed(n)); if (p) setTimeout(() => showNotice(p), 500);
 }
-const ImageView = m => {
-  const box = el("div", "card", `<h2>${esc(m ? m.title : "Imej")}</h2>`);
-  if (!m || !m.src) { box.append(el("p", "empty", "Imej belum ditetapkan.")); return box; }
-  box.append(el("img", "mimg")); const i = $("img", box); i.src = m.src; i.alt = m.alt || m.title; return box;
-};
+const ImageView = m => MediaCard(m, "image", "🖼️");
+const LinkView = m => MediaCard(m, "link", "🔗");
 function toDataUrl(file) {
   return new Promise((ok, no) => {
     const fr = new FileReader();
@@ -524,13 +556,13 @@ function toDataUrl(file) {
 }
 
 /* ============ ⑧ ADMIN PANEL (#/admin) ============ */
-const STATUSES = ["active", "draft", "coming-soon", "hidden"], KINDS = ["form", "audio", "video", "image", "faq", "contact", "content"], FTYPES = ["text", "tel", "date", "textarea", "number", "select"];
+const STATUSES = ["active", "draft", "coming-soon", "hidden"], KINDS = ["form", "audio", "video", "image", "link", "faq", "contact", "content"], FTYPES = ["text", "tel", "date", "textarea", "number", "select"];
 const COLS = {
   menus: { l: "Menu", a: MENUS, f: [["title", "Tajuk"], ["icon", "Ikon (emoji)"], ["description", "Keterangan"], ["status", "Status", "status"]], n: () => ({ title: "Menu baharu", icon: "📌", status: "draft" }) },
   submenus: { l: "Submenu", a: SUBMENUS, f: [["menuId", "Menu induk", "menu"], ["title", "Tajuk"], ["icon", "Ikon (emoji)"], ["kind", "Jenis", "kind"], ["ref", "Rujukan (id borang / media)"], ["status", "Status", "status"]], n: () => ({ menuId: MENUS[0] && MENUS[0].id, title: "Submenu baharu", icon: "📌", kind: "content", status: "draft" }) },
   forms: { l: "Borang", a: FORMS, fields: 1, f: [["title", "Tajuk"], ["description", "Keterangan"], ["template", "Template WhatsApp", "tpl"], ["cta", "Teks butang"], ["note", "Nota"]], n: () => ({ title: "Borang baharu", template: "", fields: [], status: "draft" }) },
   templates: { l: "Template", a: TEMPLATES, f: [["title", "Nama"], ["recipientId", "Nombor penerima (kosong = nombor lalai)", "num0"], ["status", "Status", "status"], ["text", "Teks mesej ({{medan}} / {{?medan}})", "area"]], n: () => ({ title: "Template baharu", recipientId: "", text: "", status: "draft" }) },
-  media: { l: "Media", a: MEDIA, f: [["title", "Tajuk"], ["type", "Jenis", "mtype"], ["src", "Sumber (URL / muat naik imej)", "src"], ["alt", "Teks alternatif imej"], ["status", "Status", "status"]], n: () => ({ title: "Media baharu", type: "audio", src: "" }) },
+  media: { l: "Media", a: MEDIA, f: [["title", "Tajuk"], ["type", "Jenis", "mtype"], ["src", "Sumber (tampal pautan: YouTube, Drive, Dropbox, GitHub, URL fail, atau muat naik imej)", "src"], ["alt", "Teks alternatif imej"], ["status", "Status", "status"]], n: () => ({ title: "Media baharu", type: "audio", src: "" }) },
   faq: { l: "FAQ", a: FAQ, f: [["menuId", "Menu", "menu"], ["q", "Soalan"], ["a", "Jawapan", "area"], ["status", "Status", "status"]], n: () => ({ menuId: MENUS[0] && MENUS[0].id, q: "Soalan baharu", a: "", status: "draft" }) },
   contacts: { l: "Hubungi", a: CONTACTS, f: [["menuId", "Menu", "menu"], ["name", "Nama"], ["role", "Jawatan"], ["phone", "No. telefon", "tel"], ["status", "Status", "status"]], n: () => ({ menuId: MENUS[0] && MENUS[0].id, name: "Pegawai baharu", role: "", phone: "", status: "draft" }) }
 };
@@ -541,7 +573,7 @@ const move = (a, i, d) => { const j = i + d; if (j >= 0 && j < a.length) [a[i], 
 const renum = a => a.forEach((x, i) => { x.sortOrder = i + 1; });
 function fi(attr, key, label, type, val) {
   const id = "a" + Math.random().toString(36).slice(2, 8);
-  const opts = { status: STATUSES, kind: KINDS, menu: MENUS.map(m => m.id), tpl: ["", ...TEMPLATES.map(t => t.id)], ftype: FTYPES, mtype: ["audio", "video", "image"], num: numOpts(), evt: [["normal", "Normal"], ["promosi", "Promosi"]], num0: [["", "(guna nombor lalai)"], ...numOpts()], mimg: ["", ...MEDIA.filter(m => m.type === "image").map(m => m.id)], disp: ["popup", "banner"], menu0: ["", ...MENUS.map(m => m.id)] }[type];
+  const opts = { status: STATUSES, kind: KINDS, menu: MENUS.map(m => m.id), tpl: ["", ...TEMPLATES.map(t => t.id)], ftype: FTYPES, mtype: ["audio", "video", "image", "link"], num: numOpts(), evt: [["normal", "Normal"], ["promosi", "Promosi"]], num0: [["", "(guna nombor lalai)"], ...numOpts()], mimg: ["", ...MEDIA.filter(m => m.type === "image").map(m => m.id)], disp: ["popup", "banner"], menu0: ["", ...MENUS.map(m => m.id)] }[type];
   let c;
   if (opts) c = `<select id="${id}" ${attr}="${key}">${opts.map(o => { const [v, l] = Array.isArray(o) ? o : [o, o]; return `<option value="${esc(v)}" ${v === val ? "selected" : ""}>${esc(l)}</option>`; }).join("")}</select>`;
   else if (type === "area") c = `<textarea id="${id}" ${attr}="${key}" rows="8">${esc(val)}</textarea>`;
@@ -700,7 +732,7 @@ const GUIDE = [
   ["E. Tambah template", "Tambah objek dalam <code>TEMPLATES</code> {id, recipient, status, text}. Guna <code>{{medan}}</code>; <code>{{?medan}}</code> membuang baris jika kosong."],
   ["F. Tambah borang", "Tambah dalam <code>FORMS</code> dengan <code>template</code> = id template, dan senarai <code>fields</code> (text, tel, date, textarea, number, select). Kemudian pautkan dengan submenu <code>kind:'form', ref:id</code>."],
   ["G. Tukar nombor WhatsApp", "Admin → <b>Nombor</b>: simpan nombor bernama (cth. Aduan, Tempahan). Admin → <b>Template</b>: pilih nombor penerima (kosong = nombor lalai di <b>Tetapan</b>). Menukar nombor di satu tempat mengemas kini semua template berkaitan."],
-  ["H. Audio / video", "Isi <code>src</code> dalam <code>MEDIA</code> (URL fail audio, YouTube, atau fail video), kemudian tukar status submenu berkaitan kepada <code>active</code>."],
+  ["H. Audio / video / imej / pautan", "Admin → Media → tampal pautan perkongsian: YouTube, Vimeo, Google Drive, Dropbox, GitHub atau URL fail (.mp3 .mp4 .jpg …). Hos lain (4shared, OneDrive, MediaFire) dibuka sebagai butang pautan. Jenis <b>pautan</b> memaparkan butang Buka untuk sebarang URL. Kemudian tetapkan submenu (jenis sama) dan status <code>active</code>."],
   ["I. Deploy", "Muat naik fail ini ke Netlify Drop, Vercel, Cloudflare Pages atau GitHub Pages. Kongsi pautan di WhatsApp. Isi <code>og:image</code> dengan URL gambar sebenar."],
   ["Panel Admin", "Buka <code>#/admin</code> (pemilik/penyunting sahaja). Edit menu, submenu, borang, template, media, FAQ dan hubungi, kemudian tekan <b>Terbitkan perubahan</b> supaya pelawat nampak versi baharu."],
   ["Pemberitahuan imej", "Media → tambah jenis <b>imej</b> dan muat naik gambar. Notis → pilih imej itu, tetapkan popup/banner, halaman sasaran dan tarikh mula/tamat, tekan 👁 untuk pratonton, kemudian Terbitkan. Notis hanya dipapar sekali setiap pelawat; tukar kandungan = dipapar semula."],
@@ -734,6 +766,7 @@ function route() {
         else if (s.kind === "audio") body.append(AudioPlayer(MEDIA.find(x => x.id === s.ref) || { title: "Audio", src: "" }));
         else if (s.kind === "video") body.append(VideoPlayer(MEDIA.find(x => x.id === s.ref) || { title: "Video", src: "" }));
         else if (s.kind === "image") body.append(ImageView(MEDIA.find(x => x.id === s.ref)));
+        else if (s.kind === "link") body.append(LinkView(MEDIA.find(x => x.id === s.ref)));
         else if (s.kind === "faq") body.append(FAQAccordion(b));
         else if (s.kind === "contact") body.append(ContactCard(b));
         else body.append(Empty("Kandungan akan ditambah."));
