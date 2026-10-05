@@ -26,7 +26,7 @@
   {
    "description": "Cara beli & topup kredit",
    "icon": "💰",
-   "status": "active",
+   "status": "coming-soon",
    "sortOrder": 3,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-05",
@@ -52,6 +52,16 @@
    "updatedAt": "2026-10-03",
    "id": "tempahan",
    "title": "Tempahan"
+  },
+  {
+   "description": "",
+   "icon": "📤📥",
+   "status": "draft",
+   "sortOrder": 6,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-05",
+   "id": "xmuv2hlvn",
+   "title": "Pertukaran Ejen Lama ke Ejen Baru"
   }
  ],
  "submenus": [
