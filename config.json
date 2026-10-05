@@ -487,7 +487,41 @@
    "id": "xmuvsz9o9",
    "title": "Borang Pertukaran Ejen Lama Ke Ejen Baharu",
    "template": "xmuvt0u2e",
-   "fields": [],
+   "fields": [
+    {
+     "section": "*Maklumat Ejen Lama*"
+    },
+    {
+     "name": "tarikh",
+     "label": "TARIKH",
+     "type": "date",
+     "required": true
+    },
+    {
+     "name": "sekolah",
+     "label": "SEKOLAH",
+     "type": "text",
+     "required": true
+    },
+    {
+     "name": "nama",
+     "label": "NAMA",
+     "type": "text",
+     "required": true
+    },
+    {
+     "name": "email",
+     "label": "EMAIL",
+     "type": "text",
+     "required": true
+    },
+    {
+     "name": "telefon",
+     "label": "NO TELEFON",
+     "type": "tel",
+     "required": true
+    }
+   ],
    "cta": "SUBMIT"
   }
  ],
