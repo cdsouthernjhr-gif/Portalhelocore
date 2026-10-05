@@ -9,8 +9,8 @@
 <meta property="og:description" content="Aduan, tempahan dan maklumat Helocore. Isi borang dan hantar melalui WhatsApp.">
 <meta property="og:type" content="website">
 <!-- Isi URL gambar OG sebenar (cth. 1200x630) apabila tersedia: -->
-<meta property="og:image" content="https://cdsouthernjhr-gif.github.io/Portalhelocore/helocore-og-v2.jpg">
-<meta property="og:image:secure_url" content="https://cdsouthernjhr-gif.github.io/Portalhelocore/helocore-og-v2.jpg">
+<meta property="og:image" content="https://cdsouthernjhr-gif.github.io/Portalhelocore/helocore-og-v3.jpg">
+<meta property="og:image:secure_url" content="https://cdsouthernjhr-gif.github.io/Portalhelocore/helocore-og-v3.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -324,10 +324,14 @@ const store = { get(k) { try { return JSON.parse(sessionStorage.getItem(k)) || {
 /* Muat konfigurasi yang diterbitkan oleh panel admin (jika ada) */
 const ORIG = { t: document.title, d: $('meta[name="description"]').content, ot: $('meta[property="og:title"]').content, od: $('meta[property="og:description"]').content };
 const cfg = () => ({ menus: MENUS, submenus: SUBMENUS, forms: FORMS, templates: TEMPLATES, media: MEDIA, faq: FAQ, contacts: CONTACTS, notices: NOTICES, settings: SETTINGS });
-try {
-  const raw = $("#cfg").textContent.trim();
-  if (raw) { const c = JSON.parse(raw); [["menus", MENUS], ["submenus", SUBMENUS], ["forms", FORMS], ["templates", TEMPLATES], ["media", MEDIA], ["faq", FAQ], ["contacts", CONTACTS], ["notices", NOTICES]].forEach(([k, a]) => { if (Array.isArray(c[k])) a.splice(0, a.length, ...c[k]); }); Object.assign(SETTINGS, c.settings || {}); }
-} catch (e) { console.error("cfg", e); }
+const GH = { owner: "cdsouthernjhr-gif", repo: "Portalhelocore", path: "config.json" }; // repo untuk simpan konfigurasi
+function applyCfg(c) {
+  [["menus", MENUS], ["submenus", SUBMENUS], ["forms", FORMS], ["templates", TEMPLATES], ["media", MEDIA], ["faq", FAQ], ["contacts", CONTACTS], ["notices", NOTICES]].forEach(([k, a]) => { if (Array.isArray(c[k])) a.splice(0, a.length, ...c[k]); });
+  const st = c.settings || {};
+  if (Array.isArray(st.numbers)) SETTINGS.numbers.splice(0, SETTINGS.numbers.length, ...st.numbers);
+  Object.keys(st).forEach(k => { if (k !== "numbers") SETTINGS[k] = st[k]; });
+}
+try { const raw = $("#cfg").textContent.trim(); if (raw) applyCfg(JSON.parse(raw)); } catch (e) { console.error("cfg", e); }
 
 /* ============ ⑥ COMPONENTS ============ */
 const Tile = (href, icon, title, desc, soon) => {
@@ -459,6 +463,17 @@ function ContactCard(menuId) {
   return box;
 }
 
+/* Status paparan sebenar: item "active" tanpa kandungan dipaparkan sebagai "Akan Datang" */
+const subReady = s => {
+  if (s.status !== "active") return false;
+  if (s.kind === "form") { const f = FORMS.find(x => x.id === s.ref), t = f && TEMPLATES.find(x => x.id === f.template); return !!(t && t.status === "active"); }
+  if (s.kind === "audio" || s.kind === "video" || s.kind === "image") { const m = MEDIA.find(x => x.id === s.ref); return !!(m && m.type === s.kind && m.src); }
+  if (s.kind === "faq") return visible(FAQ.filter(x => x.menuId === s.menuId)).length > 0;
+  if (s.kind === "contact") return visible(CONTACTS.filter(x => x.menuId === s.menuId)).length > 0;
+  return false;
+};
+const menuReady = m => m.status === "active" && visible(SUBMENUS.filter(s => s.menuId === m.id)).some(subReady);
+
 /* ============ PEMBERITAHUAN & IMEJ ============ */
 const okUrl = u => /^(https?:\/\/|#\/|tel:)/.test(u || "");
 const nKey = n => "n:" + n.id + ":" + n.updatedAt;
@@ -532,6 +547,7 @@ function fi(attr, key, label, type, val) {
   else if (type === "area") c = `<textarea id="${id}" ${attr}="${key}" rows="8">${esc(val)}</textarea>`;
   else if (type === "chk") c = `<input type="checkbox" id="${id}" ${attr}="${key}" ${val ? "checked" : ""} style="width:28px;min-height:28px">`;
   else if (type === "wa") c = `<input id="${id}" ${attr}="${key}" value="${esc(val)}" type="tel" inputmode="tel" placeholder="cth. 0123456789">`;
+  else if (type === "pw") c = `<input id="${id}" ${attr}="${key}" value="${esc(val)}" type="password" autocomplete="off" autocapitalize="off" spellcheck="false">`;
   else if (type === "date") c = `<input type="date" id="${id}" ${attr}="${key}" value="${esc(val)}">`;
   else if (type === "upload") { const d = String(val).startsWith("data:"); c = `<input type="file" id="${id}" accept="image/*" data-up="${key}">${d ? `<img src="${esc(val)}" alt="Pratonton" style="max-width:100%;border-radius:12px;margin-top:8px"><div class="hint">Imej tersimpan (${Math.round(val.length * .75 / 1024)} KB). Muat naik lagi untuk menukar.</div>` : ""}<input ${attr}="${key}" value="${d ? "" : esc(val)}" placeholder="atau tampal URL imej" style="margin-top:8px">`; }
   else c = `<input id="${id}" ${attr}="${key}" value="${esc(val)}">`;
@@ -539,9 +555,27 @@ function fi(attr, key, label, type, val) {
 }
 const ab = (act, i, txt, lbl, cls = "", f = "") => `<button type="button" class="sb ${cls}" data-act="${act}" data-i="${i}" data-f="${f}" aria-label="${lbl}">${txt}</button>`;
 
+async function publishGithub(msg) {
+  let tk = ""; try { tk = localStorage.getItem("ghtoken") || ""; } catch (e) {}
+  if (!tk) { msg("Masukkan token GitHub dahulu (kotak Simpan ke GitHub), atau guna Muat turun config.json."); return; }
+  const api = `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`, h = { Authorization: "Bearer " + tk, Accept: "application/vnd.github+json" };
+  const noAuth = "Token tidak sah atau tiada kebenaran (perlu Contents: Read and write untuk repo ini).";
+  const body = btoa(unescape(encodeURIComponent(JSON.stringify(cfg(), null, 1))));
+  try {
+    for (let i = 0; i < 2; i++) {
+      const g = await fetch(api + "?t=" + Date.now(), { headers: h }); let sha;
+      if (g.ok) sha = (await g.json()).sha; else if (g.status !== 404) { msg(g.status === 401 || g.status === 403 ? noAuth : "Gagal membaca repo (" + g.status + ")."); return; }
+      const p = await fetch(api, { method: "PUT", headers: { ...h, "Content-Type": "application/json" }, body: JSON.stringify({ message: "Kemas kini konfigurasi dari panel admin", content: body, ...(sha ? { sha } : {}) }) });
+      if (p.ok) { msg("Disimpan ke GitHub. Perubahan kelihatan dalam 1–2 minit."); return; }
+      if (p.status !== 409 && p.status !== 422) { msg(p.status === 401 || p.status === 403 ? noAuth : "Gagal menyimpan (" + p.status + ")."); return; }
+    }
+    msg("Gagal menyimpan: konflik. Cuba lagi.");
+  } catch (e) { msg("Gagal menyambung ke GitHub. Semak sambungan internet."); }
+}
 async function publishSelf(msg) {
   if (!A.ack) { const bad = problems(); if (bad.length) { A.ack = true; msg("⚠ " + bad.join("; ") + ". Tekan Terbitkan sekali lagi untuk teruskan."); return; } }
   A.ack = false;
+  if (!window.claude) { await publishGithub(msg); return; }
   const cl = window.claude, art = cl && await cl.use("artifact");
   if (!art) { msg("Penerbitan tidak tersedia di sini. Guna Salin konfigurasi."); return; }
   const c = document.documentElement.cloneNode(true);
@@ -567,7 +601,7 @@ function AdminUI() {
       if (!c.a.length) h += `<p class="empty">Belum ada item.</p>`;
       c.a.forEach((it, i) => {
         const delKey = A.col + ":" + i;
-        h += `<div class="item"><b>${esc(it.title || it.q || it.name || it.id)}</b> <span class="badge2">${esc(it.status || "")}</span><div class="hint">id: ${esc(it.id)}${it.menuId ? " · menu: " + esc(it.menuId) : ""}${A.col === "templates" ? " · penerima: " + esc(recipientOf(it) || "—") : ""} <span id="w${i}" style="color:var(--err)">${A.col === "numbers" && !validWa(it.number) ? "⚠ Format nombor tidak sah" : A.col === "templates" && it.status === "active" && !validWa(recipientOf(it)) ? "⚠ Tiada nombor penerima sah" : ""}</span></div><div class="arow">${ab("up", i, "↑", "Naik")}${ab("down", i, "↓", "Turun")}${ab("edit", i, "✎ Edit", "Edit")}${A.col === "notices" ? ab("prev", i, "👁 Pratonton", "Pratonton") : ""}${A.del === delKey ? ab("delok", i, "Sahkan padam", "Sahkan padam", "d") : ab("del", i, "🗑", "Padam", "d")}</div>`;
+        h += `<div class="item"><b>${esc(it.title || it.q || it.name || it.id)}</b> <span class="badge2">${esc(it.status || "")}</span><div class="hint">id: ${esc(it.id)}${it.menuId ? " · menu: " + esc(it.menuId) : ""}${A.col === "templates" ? " · penerima: " + esc(recipientOf(it) || "—") : ""} <span id="w${i}" style="color:var(--err)">${A.col === "numbers" && !validWa(it.number) ? "⚠ Format nombor tidak sah" : A.col === "templates" && it.status === "active" && !validWa(recipientOf(it)) ? "⚠ Tiada nombor penerima sah" : A.col === "menus" && it.status === "active" && !menuReady(it) ? "⚠ Dipaparkan sebagai Akan Datang (tiada submenu bersedia)" : A.col === "submenus" && it.status === "active" && !subReady(it) ? "⚠ Dipaparkan sebagai Akan Datang (kandungan belum ada)" : ""}</span></div><div class="arow">${ab("up", i, "↑", "Naik")}${ab("down", i, "↓", "Turun")}${ab("edit", i, "✎ Edit", "Edit")}${A.col === "notices" ? ab("prev", i, "👁 Pratonton", "Pratonton") : ""}${A.del === delKey ? ab("delok", i, "Sahkan padam", "Sahkan padam", "d") : ab("del", i, "🗑", "Padam", "d")}</div>`;
         if (A.i === i) {
           h += `<div class="panel">` + c.f.map(([k, l, t]) => fi("data-k", k, l, t === "src" ? (it.type === "image" ? "upload" : "") : t, it[k] ?? "")).join("");
           if (c.fields) {
@@ -585,7 +619,7 @@ function AdminUI() {
       });
       h += `<button type="button" class="btn alt" data-act="add">+ Tambah ${c.l.toLowerCase()}</button></div>`;
     }
-    h += `<div class="card"><button type="button" class="btn" data-act="pub">📤 Terbitkan perubahan</button><button type="button" class="btn alt" data-act="copy">📋 Salin konfigurasi (JSON)</button><div class="ok" id="am" role="status"></div><div class="hint">Perubahan hanya dilihat pelawat selepas diterbitkan.</div></div>`;
+    h += `${window.claude ? "" : `<div class="card"><h2>Simpan ke GitHub</h2><p class="lead">Tampal token GitHub (fine-grained, hanya untuk repo ini, kebenaran Contents: Read and write). Token disimpan pada peranti ini sahaja.</p>${fi("data-tk", "tk", "Token GitHub", "pw", (() => { try { return localStorage.getItem("ghtoken") || ""; } catch (e) { return ""; } })())}<button type="button" class="btn alt" data-act="dl">⬇ Muat turun config.json</button></div>`}<div class="card"><button type="button" class="btn" data-act="pub">📤 Terbitkan perubahan</button><button type="button" class="btn alt" data-act="copy">📋 Salin konfigurasi (JSON)</button><div class="ok" id="am" role="status"></div><div class="hint">Perubahan hanya dilihat pelawat selepas diterbitkan.</div></div>`;
     ui.innerHTML = h;
   };
   ui.addEventListener("click", async e => {
@@ -606,6 +640,7 @@ function AdminUI() {
     else if (act === "fup" || act === "fdown") { move(c.a[ix].fields, fx, act === "fup" ? -1 : 1); A.fi = null; }
     else if (act === "fdel") A.del = "f" + fx;
     else if (act === "fdelok") { c.a[ix].fields.splice(fx, 1); A.fi = A.del = null; }
+    else if (act === "dl") { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(cfg(), null, 1)], { type: "application/json" })); a.download = "config.json"; a.click(); msg("config.json dimuat turun. Ganti fail yang sama dalam repo GitHub."); return; }
     else if (act === "copy") { msg((await copyText(JSON.stringify(cfg(), null, 2))) ? "Konfigurasi disalin." : "Gagal menyalin."); return; }
     else if (act === "pub") { msg("Menerbitkan…"); await publishSelf(msg); return; }
     draw();
@@ -620,6 +655,7 @@ function AdminUI() {
   });
   ui.addEventListener("input", e => {
     const t = e.target;
+    if (t.dataset.tk !== undefined) { try { localStorage.setItem("ghtoken", t.value.trim()); } catch (e) {} return; }
     if (t.dataset.sg) { SETTINGS.postage[t.dataset.sg] = parseFloat(t.value) || 0; return; }
     if (t.dataset.sp) { SETTINGS.pricing[t.dataset.sp] = parseFloat(t.value) || 0; return; }
     if (t.dataset.s) { SETTINGS[t.dataset.s] = t.value; return; }
@@ -679,18 +715,18 @@ function route() {
   if (!a) {
     meta("Helocore — Portal Perkhidmatan Interaktif", "Pilih perkhidmatan Helocore: telefon awam, kad, tempahan dan lain-lain.");
     html = Hero(null, "Portal Perkhidmatan Helocore", "");
-    const g = el("div", "grid"); visible(MENUS).forEach(m => g.append(Tile(`#/m/${m.id}`, m.icon, m.title, m.description, m.status === "coming-soon"))); body.append(g);
+    const g = el("div", "grid"); visible(MENUS).forEach(m => g.append(Tile(`#/m/${m.id}`, m.icon, m.title, m.description, !menuReady(m)))); body.append(g);
   } else if (a === "m" && MENUS.find(m => m.id === b && m.status !== "hidden" && m.status !== "draft")) {
     const m = MENUS.find(x => x.id === b); const subs = visible(SUBMENUS.filter(s => s.menuId === b));
     if (!c) {
       meta(`${m.title} — Helocore`, m.description);
       html = Hero("#/", `${m.icon} ${m.title}`, m.id === "telefon-awam" ? "Lapor kerosakan, semak panduan dan dapatkan bantuan dengan cepat." : m.description, m.id === "telefon-awam" && !m.image ? PHONE_SVG : "", m.hero && m.image ? `<img class="phonepic" src="${m.image}" width="520" height="707" alt="Telefon awam Helocore berwarna oren dengan paparan biru dan pembaca kad hijau">` : "");
       if (m.image && !m.hero) body.append(CardShot(m));
-      if (m.status === "coming-soon" || !subs.length) body.append(Empty("Kandungan akan datang."));
-      else { const g = el("div", "grid"); subs.forEach(s => g.append(Tile(`#/m/${b}/${s.id}`, s.icon, s.title, "", s.status === "coming-soon"))); body.append(g); }
+      if (!menuReady(m)) body.append(Empty("Kandungan akan datang."));
+      else { const g = el("div", "grid"); subs.forEach(s => g.append(Tile(`#/m/${b}/${s.id}`, s.icon, s.title, "", !subReady(s)))); body.append(g); }
     } else {
       const s = subs.find(x => x.id === c);
-      if (!s || s.status === "coming-soon") { html = Hero(`#/m/${b}`, "Akan Datang", "Halaman ini belum tersedia."); body.append(Empty("Kandungan sedang disediakan.")); meta("Akan Datang — Helocore", "Kandungan sedang disediakan."); }
+      if (!s || !subReady(s)) { html = Hero(`#/m/${b}`, "Akan Datang", "Halaman ini belum tersedia."); body.append(Empty("Kandungan sedang disediakan.")); meta("Akan Datang — Helocore", "Kandungan sedang disediakan."); }
       else {
         meta(`${s.title} — ${m.title}`, `${s.title} · ${m.title} · Helocore`);
         html = Hero(`#/m/${b}`, `${s.icon} ${s.title}`, m.title);
@@ -724,7 +760,10 @@ document.addEventListener("pointermove", e => { const t = e.target.closest && e.
 document.addEventListener("pointermove", e => { const f = e.target.closest && e.target.closest(".cardshot"); if (!f) return; const r = f.getBoundingClientRect(); f.style.setProperty("--ry", ((e.clientX - r.left) / r.width - .5) * 14 + "deg"); f.style.setProperty("--rx", -((e.clientY - r.top) / r.height - .5) * 14 + "deg"); }, { passive: true });
 document.addEventListener("pointerout", e => { const f = e.target.closest && e.target.closest(".cardshot"); if (f) { f.style.setProperty("--rx", "0deg"); f.style.setProperty("--ry", "0deg"); } });
 window.addEventListener("hashchange", route);
-try { route(); } catch (e) { console.error(e); $("#app").innerHTML = '<p class="empty" style="padding:60px 16px">Maaf, ralat berlaku. Sila muat semula halaman.</p>'; }
+(async () => {
+  try { const r = await Promise.race([fetch("config.json?t=" + Date.now(), { cache: "no-store" }), new Promise((_, no) => setTimeout(no, 2500))]); if (r.ok) applyCfg(await r.json()); } catch (e) {}
+  try { route(); } catch (e) { console.error(e); $("#app").innerHTML = '<p class="empty" style="padding:60px 16px">Maaf, ralat berlaku. Sila muat semula halaman.</p>'; }
+})();
 </script>
 
 
