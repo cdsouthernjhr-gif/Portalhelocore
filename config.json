@@ -566,7 +566,7 @@
    "id": "xmuw4n2m4",
    "title": "Pertukaran Ejen Lama Ke Ejen Baru",
    "recipientId": "xmuufjvv4",
-   "text": "#PERTUKARAN EJEN LAMA KE EJEN BAHARU\n\nMaklumat Ejen Lama\n🗓TARIKH:\n🏫SEKOLAH:\n👨‍🏫NAMA:\n📧EMAIL:\n☎️NO TELEFON:\n\n\nMaklumat Ejen Baharu\n👨‍🏫NAMA:\n📧EMAIL:\n☎️NO TELEFON"
+   "text": "#PERTUKARAN EJEN LAMA KE EJEN BARU\n\nMaklumat Ejen Lama\n🗓TARIKH:{{tarikh}}\n🏫SEKOLAH:{{sekolah}}\n👨‍🏫NAMA:{{nama}}\n📧EMAIL:{{email}}\n☎️NO TELEFON:{{telefon}}\n\n\nMaklumat Ejen Baru\n👨‍🏫NAMA:{{nama1}}\n📧EMAIL:{{email1}}\n☎️NO TELEFON:{{telefon}}"
   }
  ],
  "media": [
