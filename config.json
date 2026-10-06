@@ -217,6 +217,19 @@
    "title": "Cara Daftar Ejen Baru",
    "kind": "image",
    "ref": "xmuxawtew"
+  },
+  {
+   "description": "",
+   "icon": "📑",
+   "status": "active",
+   "sortOrder": 13,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "id": "xmuxb6vk4",
+   "menuId": "tempahan",
+   "title": "Katalog",
+   "kind": "image",
+   "ref": "xmuxb06ny"
   }
  ],
  "forms": [
