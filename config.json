@@ -655,6 +655,18 @@
    "title": "MaklumBalas",
    "type": "link",
    "src": "https://docs.google.com/forms/d/e/1FAIpQLSdIWbQHpjLlvTuCH0X7gv6DH2ZARXH3KQwr7KA5pZM1qn3JqA/viewform"
+  },
+  {
+   "description": "",
+   "icon": "",
+   "status": "draft",
+   "sortOrder": 8,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "id": "xmuxawtew",
+   "title": "Daftar Ejen Baru",
+   "type": "image",
+   "src": ""
   }
  ],
  "faq": [],
