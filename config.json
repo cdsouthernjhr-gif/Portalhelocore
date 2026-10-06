@@ -177,8 +177,8 @@
    "menuId": "telefon-awam",
    "id": "maklumbalas",
    "title": "Maklum Balas",
-   "kind": "link",
-   "ref": "https://docs.google.com/forms/d/e/1FAIpQLSdIWbQHpjLlvTuCH0X7gv6DH2ZARXH3KQwr7KA5pZM1qn3JqA/viewform"
+   "kind": "content",
+   "ref": ""
   },
   {
    "description": "",
@@ -631,6 +631,18 @@
    "title": "Promosi oktober poket saver",
    "type": "image",
    "src": "https://drive.google.com/file/d/1ZNxIP11pd2cAoCSu5u-1nJthaqXwdv-a/view?usp=drivesdk"
+  },
+  {
+   "description": "",
+   "icon": "",
+   "status": "active",
+   "sortOrder": 7,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "id": "xmuxao0fc",
+   "title": "MaklumBalas",
+   "type": "link",
+   "src": ""
   }
  ],
  "faq": [],
