@@ -52,6 +52,16 @@
    "updatedAt": "2026-10-03",
    "id": "tempahan",
    "title": "Tempahan"
+  },
+  {
+   "description": "",
+   "icon": "📥📤",
+   "status": "coming-soon",
+   "sortOrder": 6,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-06",
+   "id": "xmuw51ilt",
+   "title": "Pertukaran Ejen Lama ke Baru"
   }
  ],
  "submenus": [
@@ -170,10 +180,10 @@
   {
    "description": "",
    "icon": "ℹ️",
-   "status": "active",
+   "status": "coming-soon",
    "sortOrder": 10,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-05",
+   "updatedAt": "2026-10-06",
    "menuId": "kad",
    "id": "maklumat",
    "title": "Maklumat Kad",
@@ -215,6 +225,18 @@
    "title": "Borang Tempahan Selatan",
    "kind": "form",
    "ref": "tempahan-selatan"
+  },
+  {
+   "description": "",
+   "icon": "📌",
+   "status": "draft",
+   "sortOrder": 14,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-03",
+   "id": "xmuw50hcb",
+   "menuId": "telefon-awam",
+   "title": "Submenu baharu",
+   "kind": "content"
   }
  ],
  "forms": [
