@@ -676,8 +676,8 @@
    "menuId": "",
    "mula": "2026-10-06",
    "tamat": "2026-10-30",
-   "btnText": "Buka Aduan Telefon Awam",
-   "btnUrl": "#/m/telefon-awam/aduan"
+   "btnText": "",
+   "btnUrl": "#/m/telefon-awam"
   }
  ],
  "settings": {
