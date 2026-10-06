@@ -196,11 +196,11 @@
   {
    "description": "",
    "icon": "❓",
-   "status": "draft",
+   "status": "active",
    "sortOrder": 11,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
-   "menuId": "kad",
+   "menuId": "telefon-awam",
    "id": "faq",
    "title": "FAQ",
    "kind": "faq"
