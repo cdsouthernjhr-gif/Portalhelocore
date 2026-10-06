@@ -204,6 +204,18 @@
    "id": "faq",
    "title": "FAQ",
    "kind": "faq"
+  },
+  {
+   "description": "",
+   "icon": "📥",
+   "status": "draft",
+   "sortOrder": 12,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "id": "xmuxatoue",
+   "menuId": "xmuw51ilt",
+   "title": "Cara Daftar Ejen Baru",
+   "kind": "image"
   }
  ],
  "forms": [
