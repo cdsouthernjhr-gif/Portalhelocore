@@ -611,11 +611,11 @@
    "status": "active",
    "sortOrder": 2,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-03",
+   "updatedAt": "2026-10-06",
    "id": "video-cara",
-   "type": "video",
+   "type": "image",
    "title": "Cara Menggunakan Telefon Awam Helocore",
-   "src": ""
+   "src": "https://drive.google.com/file/d/1zDWX7yoLnXbpq5PoYvPbD8UM3MYLbaB-/view?usp=drivesdk"
   },
   {
    "description": "",
