@@ -26,7 +26,7 @@
   {
    "description": "Cara beli & topup kredit",
    "icon": "💰",
-   "status": "coming-soon",
+   "status": "active",
    "sortOrder": 3,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-05",
@@ -52,16 +52,6 @@
    "updatedAt": "2026-10-03",
    "id": "tempahan",
    "title": "Tempahan"
-  },
-  {
-   "description": "",
-   "icon": "📤📥",
-   "status": "draft",
-   "sortOrder": 6,
-   "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-05",
-   "id": "xmuv2hlvn",
-   "title": "Pertukaran Ejen Lama ke Ejen Baru"
   }
  ],
  "submenus": [
@@ -187,8 +177,7 @@
    "menuId": "kad",
    "id": "maklumat",
    "title": "Maklumat Kad",
-   "kind": "image",
-   "ref": "xmuug4g4w"
+   "kind": "content"
   },
   {
    "description": "",
@@ -476,53 +465,6 @@
    ],
    "note": "Bayaran boleh dibuat di akaun: MAYBANK 512334315142 — HELODOTCOM SDN BHD (0196586688).",
    "cta": "Submit"
-  },
-  {
-   "description": "",
-   "icon": "",
-   "status": "draft",
-   "sortOrder": 4,
-   "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-06",
-   "id": "xmuvsz9o9",
-   "title": "Borang Pertukaran Ejen Lama Ke Ejen Baharu",
-   "template": "xmuvt0u2e",
-   "fields": [
-    {
-     "section": "*Maklumat Ejen Lama*"
-    },
-    {
-     "name": "tarikh",
-     "label": "TARIKH",
-     "type": "date",
-     "required": true
-    },
-    {
-     "name": "sekolah",
-     "label": "SEKOLAH",
-     "type": "text",
-     "required": true
-    },
-    {
-     "name": "nama",
-     "label": "NAMA",
-     "type": "text",
-     "required": true
-    },
-    {
-     "name": "email",
-     "label": "EMAIL",
-     "type": "text",
-     "required": true
-    },
-    {
-     "name": "telefon",
-     "label": "NO TELEFON",
-     "type": "tel",
-     "required": true
-    }
-   ],
-   "cta": "SUBMIT"
   }
  ],
  "templates": [
@@ -545,18 +487,6 @@
    "text": "📦 BORANG TEMPAHAN SELATAN\n\n*Maklumat Tempahan*\nTARIKH: {{tarikh}}\nNAMA: {{nama}}\nSEKOLAH: {{sekolah}}\nALAMAT: {{alamat}}\nTELEFON: {{telefon}}\n\n*Butiran Tempahan*\nRFID/KAD: {{?rfid}}\nTOPUP KREDIT: {{?topup}}\nVOUCER RM3: {{?v3}}\nVOUCER RM5: {{?v5}}\nVOUCER RM10: {{?v10}}\n\n*Bayaran*\nTOTAL RM: {{?total}}\nKOMISYEN: {{?komisyen}}\nPOSTAGE: {{?postage}}\nJUMLAH BAYARAN: {{?jumlah}}\n\nBayaran boleh dibuat di akaun:\nMAYBANK\n512334315142\nHELODOTCOM SDN BHD\n0196586688",
    "updatedAt": "2026-10-05",
    "title": "Tempahan selatan"
-  },
-  {
-   "description": "",
-   "icon": "",
-   "status": "draft",
-   "sortOrder": 4,
-   "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-06",
-   "id": "xmuvt0u2e",
-   "title": "Pertukaran Ejen",
-   "recipientId": "xmuufjvv4",
-   "text": "#PERTUKARAN EJEN LAMA KE EJEN BAHARU\n\n*Maklumat Ejen Lama*\n🗓TARIKH:{{tarikh}}\n🏫SEKOLAH:{{sekolah}}\n👨‍🏫NAMA:{{nama}}\n📧EMAIL:{{email}}\n☎️NO TELEFON:{{telefon}}\n\n\n*Maklumat Ejen Baharu*\n👨‍🏫NAMA:{{nama1}}\n📧EMAIL:{{email1}}\n☎️NO TELEFON:{{telefon1}}"
   }
  ],
  "media": [
@@ -619,7 +549,7 @@
    "id": "xmuug4g4w",
    "title": "Maklumat kad",
    "type": "image",
-   "src": "https://drive.google.com/file/d/1ZK1iPvc60ZngmnyJ2pGL4XVc1IXXklOM/view?usp=drivesdk"
+   "src": ""
   }
  ],
  "faq": [],
@@ -687,29 +617,33 @@
   "commission": {
    "normal": [
     {
-     "lt": 3001,
+     "from": 0,
      "pct": 10
     },
     {
-     "lt": 5000,
+     "from": 1000,
+     "pct": 10
+    },
+    {
+     "from": 3000,
      "pct": 15
     },
     {
-     "lt": null,
+     "from": 5000,
      "pct": 20
     }
    ],
    "promosi": [
     {
-     "lt": 1001,
+     "from": 0,
      "pct": 10
     },
     {
-     "lt": 5000,
+     "from": 1000,
      "pct": 15
     },
     {
-     "lt": null,
+     "from": 5000,
      "pct": 20
     }
    ]
