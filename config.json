@@ -97,8 +97,8 @@
    "status": "coming-soon",
    "sortOrder": 3,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-03",
-   "menuId": "telefon-awam",
+   "updatedAt": "2026-10-06",
+   "menuId": "kad",
    "id": "kad-kredit",
    "title": "Kad & Kredit",
    "kind": "content"
@@ -180,14 +180,14 @@
   {
    "description": "",
    "icon": "ℹ️",
-   "status": "coming-soon",
+   "status": "active",
    "sortOrder": 10,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-06",
    "menuId": "kad",
    "id": "maklumat",
    "title": "Maklumat Kad",
-   "kind": "content"
+   "kind": "image"
   },
   {
    "description": "",
