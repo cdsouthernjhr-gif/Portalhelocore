@@ -177,8 +177,8 @@
    "menuId": "telefon-awam",
    "id": "maklumbalas",
    "title": "Maklum Balas",
-   "kind": "content",
-   "ref": "xmuxao0fc"
+   "kind": "link",
+   "ref": ""
   },
   {
    "description": "",
