@@ -206,14 +206,15 @@
   {
    "description": "",
    "icon": "📞",
-   "status": "coming-soon",
+   "status": "active",
    "sortOrder": 12,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-03",
+   "updatedAt": "2026-10-06",
    "menuId": "telefon-awam",
    "id": "hubungi",
    "title": "Hubungi Kami",
-   "kind": "contact"
+   "kind": "contact",
+   "ref": "xmuwiw5f8"
   },
   {
    "description": "",
