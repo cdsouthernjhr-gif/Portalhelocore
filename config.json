@@ -678,6 +678,24 @@
    "tamat": "2026-10-30",
    "btnText": "Buka Aduan Telefon Awam",
    "btnUrl": ""
+  },
+  {
+   "description": "",
+   "icon": "",
+   "status": "draft",
+   "sortOrder": 2,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-06",
+   "id": "xmuwksfyz",
+   "title": "Pemberitahuan baharu",
+   "message": "",
+   "mediaId": "imej-contoh",
+   "display": "popup",
+   "menuId": "",
+   "mula": "",
+   "tamat": "",
+   "btnText": "",
+   "btnUrl": ""
   }
  ],
  "settings": {
