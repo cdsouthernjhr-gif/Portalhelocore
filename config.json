@@ -672,12 +672,12 @@
    "title": "Promosi oktober",
    "message": "Jangan segan untuk hubungi saya jika ada persoalan",
    "mediaId": "xmuwj79ud",
-   "display": "popup",
+   "display": "banner",
    "menuId": "",
    "mula": "2026-10-06",
    "tamat": "2026-10-30",
    "btnText": "Buka Aduan Telefon Awam",
-   "btnUrl": "#/m"
+   "btnUrl": "#/m/telefon-awam"
   }
  ],
  "settings": {
