@@ -26,10 +26,10 @@
   {
    "description": "Cara beli & topup kredit",
    "icon": "💰",
-   "status": "coming-soon",
+   "status": "draft",
    "sortOrder": 3,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-06",
+   "updatedAt": "2026-10-07",
    "id": "topup",
    "title": "Topup Helocore"
   },
@@ -56,10 +56,10 @@
   {
    "description": "Maklumat & bantuan",
    "icon": "🎓",
-   "status": "coming-soon",
+   "status": "draft",
    "sortOrder": 6,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
    "id": "mypelajar",
    "title": "MyPelajar"
   }
@@ -107,10 +107,10 @@
   {
    "description": "",
    "icon": "💳",
-   "status": "coming-soon",
+   "status": "draft",
    "sortOrder": 4,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-06",
+   "updatedAt": "2026-10-07",
    "menuId": "kad",
    "id": "kad-kredit",
    "title": "Kad & Kredit",
@@ -119,10 +119,10 @@
   {
    "description": "",
    "icon": "❓",
-   "status": "coming-soon",
+   "status": "draft",
    "sortOrder": 5,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
    "menuId": "telefon-awam",
    "id": "faq",
    "title": "Soalan Lazim",
@@ -196,10 +196,10 @@
   {
    "description": "",
    "icon": "❓",
-   "status": "coming-soon",
+   "status": "draft",
    "sortOrder": 11,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
    "menuId": "kad",
    "id": "faq",
    "title": "FAQ",
@@ -698,7 +698,20 @@
    "alt": "Senarai produk dengan harga"
   }
  ],
- "faq": [],
+ "faq": [
+  {
+   "description": "",
+   "icon": "",
+   "status": "draft",
+   "sortOrder": 1,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-03",
+   "id": "xmuxbisdk",
+   "menuId": "telefon-awam",
+   "q": "Soalan baharu",
+   "a": ""
+  }
+ ],
  "contacts": [
   {
    "description": "",
