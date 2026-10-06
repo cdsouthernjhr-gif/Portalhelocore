@@ -208,14 +208,15 @@
   {
    "description": "",
    "icon": "📥",
-   "status": "draft",
+   "status": "active",
    "sortOrder": 12,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
    "id": "xmuxatoue",
    "menuId": "xmuw51ilt",
    "title": "Cara Daftar Ejen Baru",
-   "kind": "image"
+   "kind": "content",
+   "ref": "xmuxawtew"
   }
  ],
  "forms": [
