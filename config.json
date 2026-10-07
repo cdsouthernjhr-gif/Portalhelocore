@@ -26,7 +26,7 @@
   {
    "description": "Cara beli & topup kredit",
    "icon": "💰",
-   "status": "coming-soon",
+   "status": "active",
    "sortOrder": 3,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
@@ -117,14 +117,15 @@
   {
    "description": "",
    "icon": "💳",
-   "status": "coming-soon",
+   "status": "active",
    "sortOrder": 4,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
    "menuId": "topup",
    "id": "kad-kredit",
    "title": "Aplikasi Tambahnilai",
-   "kind": "content"
+   "kind": "content",
+   "ref": "xmuxawtew"
   },
   {
    "description": "",
