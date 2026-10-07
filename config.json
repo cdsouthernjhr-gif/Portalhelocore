@@ -496,7 +496,7 @@
     },
     {
      "name": "v3",
-     "label": "Voucer RM3 (buku)",
+     "label": "Baucer RM3 (buku)",
      "type": "number",
      "required": false,
      "price": "v3",
@@ -504,7 +504,7 @@
     },
     {
      "name": "v5",
-     "label": "Voucer RM5 (buku)",
+     "label": "Baucer RM5 (buku)",
      "type": "number",
      "required": false,
      "price": "v5",
@@ -512,7 +512,7 @@
     },
     {
      "name": "v10",
-     "label": "Voucer RM10 (buku)",
+     "label": "Baucer RM10 (buku)",
      "type": "number",
      "required": false,
      "price": "v10",
