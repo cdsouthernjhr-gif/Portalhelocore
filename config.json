@@ -334,7 +334,7 @@
     },
     {
      "name": "telefon",
-     "label": "No. Telefon",
+     "label": "No. Telefon Pengadu",
      "type": "tel",
      "required": true
     },
