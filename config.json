@@ -56,7 +56,7 @@
   {
    "description": "Maklumat & bantuan",
    "icon": "🎓",
-   "status": "draft",
+   "status": "active",
    "sortOrder": 6,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
@@ -129,14 +129,15 @@
   {
    "description": "",
    "icon": "💬",
-   "status": "draft",
+   "status": "active",
    "sortOrder": 5,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
    "menuId": "mypelajar",
    "id": "faq",
    "title": "Maklumat MyPelajar",
-   "kind": "image"
+   "kind": "image",
+   "ref": "xmuxtutvk"
   },
   {
    "description": "",
