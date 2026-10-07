@@ -64,8 +64,8 @@
    "title": "MyPelajar"
   },
   {
-   "description": "",
-   "icon": "🎫",
+   "description": "8hb okt 2026  sehingga 30hb okt 2026",
+   "icon": "🔊",
    "status": "active",
    "sortOrder": 7,
    "createdAt": "2026-10-03",
@@ -243,14 +243,14 @@
   },
   {
    "description": "",
-   "icon": "🎫",
+   "icon": "📣pocket saver",
    "status": "active",
    "sortOrder": 14,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
    "id": "xmuxf98sv",
    "menuId": "xmuxf6hnr",
-   "title": "Promosi",
+   "title": "Promosi Oktober Pocket Saver",
    "kind": "image",
    "ref": "xmuwj79ud"
   }
