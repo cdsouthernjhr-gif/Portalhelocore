@@ -266,6 +266,18 @@
    "title": "Promosi Oktober Pocket Saver - pelajar",
    "kind": "image",
    "ref": "xmuxfw965"
+  },
+  {
+   "description": "",
+   "icon": "❓️",
+   "status": "active",
+   "sortOrder": 16,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "id": "xmuxgeiae",
+   "menuId": "kad",
+   "title": "FAQ",
+   "kind": "faq"
   }
  ],
  "forms": [
