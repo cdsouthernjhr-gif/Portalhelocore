@@ -291,6 +291,19 @@
    "menuId": "mypelajar",
    "title": "FAQ",
    "kind": "faq"
+  },
+  {
+   "description": "",
+   "icon": "📞",
+   "status": "active",
+   "sortOrder": 18,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "id": "xmuxu77t0",
+   "menuId": "mypelajar",
+   "title": "Hubungi Kami",
+   "kind": "contact",
+   "ref": "xmuxuacj8"
   }
  ],
  "forms": [
@@ -1025,6 +1038,19 @@
    "updatedAt": "2026-10-06",
    "id": "xmuwiw5f8",
    "menuId": "telefon-awam",
+   "name": "NORHISHAM B.ABDUL RAHMAN",
+   "role": "PEGAWAI PEMASARAN WILAYAH SELATAN",
+   "phone": "0167365120"
+  },
+  {
+   "description": "",
+   "icon": "",
+   "status": "active",
+   "sortOrder": 2,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "id": "xmuxuacj8",
+   "menuId": "mypelajar",
    "name": "NORHISHAM B.ABDUL RAHMAN",
    "role": "PEGAWAI PEMASARAN WILAYAH SELATAN",
    "phone": "0167365120"
