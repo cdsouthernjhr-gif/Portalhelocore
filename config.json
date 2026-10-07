@@ -62,6 +62,16 @@
    "updatedAt": "2026-10-07",
    "id": "mypelajar",
    "title": "MyPelajar"
+  },
+  {
+   "description": "",
+   "icon": "🎫",
+   "status": "draft",
+   "sortOrder": 7,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "id": "xmuxf6hnr",
+   "title": "🎊 Promosi 🎉"
   }
  ],
  "submenus": [
@@ -230,6 +240,19 @@
    "title": "Katalog",
    "kind": "image",
    "ref": "xmuxb06ny"
+  },
+  {
+   "description": "",
+   "icon": "🎫",
+   "status": "draft",
+   "sortOrder": 14,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "id": "xmuxf98sv",
+   "menuId": "tempahan",
+   "title": "Promosi",
+   "kind": "image",
+   "ref": "xmuwj79ud"
   }
  ],
  "forms": [
