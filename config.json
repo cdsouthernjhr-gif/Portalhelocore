@@ -601,9 +601,10 @@
  "templates": [
   {
    "id": "aduan-telefon-awam",
-   "recipientId": "aduan",
+   "recipientId": "xmuufjvv4",
    "status": "active",
-   "text": "📢 ADUAN KEROSAKAN TELEFON AWAM\n\n📅 Tarikh: {{tarikh}}\n👤 Pengadu: {{pengadu}}\n📞 No. Telefon: {{telefon}}\n🏫 Nama Penuh Sekolah: {{sekolah}}\n\n📝 Aduan Kerosakan:\n{{aduan}}"
+   "text": "📢 ADUAN KEROSAKAN TELEFON AWAM\n\n📅 Tarikh: {{tarikh}}\n👤 Pengadu: {{pengadu}}\n📞 No. Telefon: {{telefon}}\n🏫 Nama Penuh Sekolah: {{sekolah}}\n\n📝 Aduan Kerosakan:\n{{aduan}}",
+   "updatedAt": "2026-10-07"
   },
   {
    "id": "aduan-kad",
