@@ -128,15 +128,15 @@
   },
   {
    "description": "",
-   "icon": "❓",
+   "icon": "💬",
    "status": "draft",
    "sortOrder": 5,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
-   "menuId": "telefon-awam",
+   "menuId": "mypelajar",
    "id": "faq",
-   "title": "Soalan Lazim",
-   "kind": "faq"
+   "title": "Maklumat MyPelajar",
+   "kind": "image"
   },
   {
    "description": "",
@@ -205,21 +205,9 @@
   },
   {
    "description": "",
-   "icon": "❓",
-   "status": "active",
-   "sortOrder": 11,
-   "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-07",
-   "menuId": "telefon-awam",
-   "id": "faq",
-   "title": "FAQ",
-   "kind": "faq"
-  },
-  {
-   "description": "",
    "icon": "📥",
    "status": "active",
-   "sortOrder": 12,
+   "sortOrder": 11,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
    "id": "xmuxatoue",
@@ -232,7 +220,7 @@
    "description": "",
    "icon": "📑",
    "status": "active",
-   "sortOrder": 13,
+   "sortOrder": 12,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
    "id": "xmuxb6vk4",
@@ -245,7 +233,7 @@
    "description": "",
    "icon": "📣pocket saver - Ejen",
    "status": "active",
-   "sortOrder": 14,
+   "sortOrder": 13,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
    "id": "xmuxf98sv",
@@ -258,7 +246,7 @@
    "description": "",
    "icon": "📣pocket saver - Pelajar",
    "status": "active",
-   "sortOrder": 15,
+   "sortOrder": 14,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
    "id": "xmuxfttb6",
@@ -266,6 +254,18 @@
    "title": "Promosi Oktober Pocket Saver - pelajar",
    "kind": "image",
    "ref": "xmuxfw965"
+  },
+  {
+   "description": "",
+   "icon": "❓",
+   "status": "active",
+   "sortOrder": 15,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "menuId": "telefon-awam",
+   "id": "faq",
+   "title": "FAQ",
+   "kind": "faq"
   },
   {
    "description": "",
