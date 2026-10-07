@@ -782,7 +782,7 @@
    "id": "xmuxbtsga",
    "menuId": "telefon-awam",
    "q": "Bagaimana cara menggunakan telefon Helocore?",
-   "a": "1.Angkat ganggang telefon.\n2.Sentuhkan Kad ke panel di telefon\n3.Dail nombor telefon.\n4.Selesai panggilan, letakkan semula ganggang."
+   "a": "1.Angkat ganggang telefon.\n\n2.Sentuhkan Kad ke panel di telefon.\n\n3.Dail nombor telefon.\n\n4.Selesai panggilan, letakkan semula ganggang."
   },
   {
    "description": "",
@@ -926,7 +926,7 @@
    "id": "xmuxc49j5",
    "menuId": "kad",
    "q": "Bagaimana cara membuat aduan Kad Hilang/Rosak?",
-   "a": "Sediakan:\nNama Pelajar\nNo. Kad Lama\nNo. Kad Baharu jika ada\nNama Pengadu\nNo. Telefon Pengadu\nNama Sekolah\nJenis Aduan"
+   "a": "Sediakan:\n\nNama Pelajar\n\nNo. Kad Lama\n\nNo. Kad Baharu jika ada\n\nNama Pengadu\n\nNo. Telefon Pengadu\n\nNama Sekolah\n\nJenis Aduan\n\nAtau boleh isikan borang di ruangan aduan kad hilang/rosak"
   }
  ],
  "contacts": [
