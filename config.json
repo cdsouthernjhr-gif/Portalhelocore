@@ -479,7 +479,7 @@
     },
     {
      "name": "alamat",
-     "label": "Alamat",
+     "label": "Alamat Sekolah",
      "type": "textarea",
      "required": true
     },
@@ -657,8 +657,8 @@
    "id": "tempahan-selatan",
    "recipientId": "xmuufjvv4",
    "status": "active",
-   "text": "📦 BORANG TEMPAHAN - SELATAN\n\n*Maklumat Tempahan*\nTARIKH: {{tarikh}}\nNAMA: {{nama}}\nSEKOLAH: {{sekolah}}\nALAMAT SEKOLAH: {{alamat}}\nNO.TELEFON: {{telefon}}\n\n*Butiran Tempahan*\nRFID/KAD: {{?rfid}}\nTOPUP KREDIT: {{?topup}}\nBAUCER RM3: {{?v3}}\nBAUCER RM5: {{?v5}}\nBAUCER RM10: {{?v10}}\n\n*Bayaran*\nJUMLAH RM: {{?total}}\nKOMISYEN: {{?komisyen}}\nKOS PENGHANTARAN: {{?postage}}\nJUMLAH BAYARAN: {{?jumlah}}\n\nBayaran boleh dibuat di akaun:\nMAYBANK\n512334315142\nHELODOTCOM SDN BHD\n0196586688",
-   "updatedAt": "2026-10-07",
+   "text": "📦 BORANG TEMPAHAN - SELATAN\n\n*Maklumat Tempahan*\nTARIKH: {{tarikh}}\nNAMA: {{nama}}\nSEKOLAH: {{sekolah}}\nALAMAT: {{alamat}}\nNO.TELEFON: {{telefon}}\n\n*Butiran Tempahan*\nRFID/KAD: {{?rfid}}\nTOPUP KREDIT: {{?topup}}\nBAUCER RM3: {{?v3}}\nBAUCER RM5: {{?v5}}\nBAUCER RM10: {{?v10}}\n\n*Bayaran*\nJUMLAH RM: {{?total}}\nKOMISYEN: {{?komisyen}}\nKOS PENGHANTARAN: {{?postage}}\nJUMLAH BAYARAN: {{?jumlah}}\n\nBayaran boleh dibuat di akaun:\nMAYBANK\n512334315142\nHELODOTCOM SDN BHD\n0196586688",
+   "updatedAt": "2026-10-08",
    "title": "Tempahan selatan"
   },
   {
