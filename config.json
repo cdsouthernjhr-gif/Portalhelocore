@@ -1164,7 +1164,7 @@
   {
    "description": "",
    "icon": "",
-   "status": "draft",
+   "status": "active",
    "sortOrder": 1,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-09",
@@ -1182,7 +1182,7 @@
     {
      "type": "button",
      "label": "TEMPAHAN",
-     "url": "#/menu/tempahan"
+     "url": "#/m/selatan/tempahan-selatan"
     }
    ]
   }
