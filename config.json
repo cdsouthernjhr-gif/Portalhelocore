@@ -1160,7 +1160,33 @@
    "btnUrl": "#/m"
   }
  ],
- "pages": [],
+ "pages": [
+  {
+   "description": "",
+   "icon": "",
+   "status": "draft",
+   "sortOrder": 1,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-09",
+   "id": "promosi-ejen-teks",
+   "title": "PROMOSI OCTOBER",
+   "blocks": [
+    {
+     "type": "image",
+     "mediaId": "media-promosi-ejen"
+    },
+    {
+     "type": "text",
+     "text": "Bulan Oktober ini, Helocore ada buat promosi khas untuk semua ejen! Tujuan promosi ni dibuat adalah untuk bantu ejen dapatkan lebih banyak penjimatan dan untung lebih.  \n​Ini 3 perkara penting yang anda perlu tahu tentang promosi ini:\n​1. Diskaun Jimat Berbaloi (10% + 5%)\nSetiap kali anda buat pembelian minimum sebanyak RM1,000 (sama ada untuk Kad Helocore, baucar, atau aplikasi), anda akan terus layak dapat potongan harga sebanyak 10% ditambah lagi 5%. Memang banyak jimat tu!  \n​2. Peluang Menang Cabutan Bertuah RM2,000\nSelain dapat diskaun, kalau anda buat pembelian bernilai RM2,000 (setelah tolak diskaun dan jumlah mata digabung ), anda akan dapat 1 tiket cabutan bertuah. Pihak Helocore sediakan hadiah keseluruhan bernilai RM2,000 untuk 20 orang pemenang. Anda boleh kumpul sampai maksimum 5 tiket untuk cerahkan lagi peluang menang!  \n​3. Tempoh Masa Terhad\nPromosi ini sah bermula dari 8 Oktober sehingga 30 Oktober 2026 sahaja. Jangan tunggu saat akhir, nanti terlepas peluang. Keputusan pemenang cabutan bertuah pula akan diumumkan seminggu selepas promosi tamat, iaitu pada Jumaat, 6 November 2026.  "
+    },
+    {
+     "type": "button",
+     "label": "TEMPAHAN",
+     "url": "#/menu/tempahan"
+    }
+   ]
+  }
+ ],
  "settings": {
   "brand": "HELOCORE",
   "countryCode": "60",
