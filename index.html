@@ -678,6 +678,23 @@ function restoreCfg(c) {
   applyCfg(c); return true;
 }
 const backupCard = () => { const bl = bkGet(); return `<div class="card"><h2>Sandaran &amp; Pemulihan</h2><button type="button" class="btn" data-act="bk">⬇ Muat turun sandaran (config + tarikh)</button><label for="rst">Pulihkan daripada fail sandaran</label><input type="file" id="rst" accept=".json,application/json" data-restore="1"><div class="hint">Fail disemak dahulu. Jika sah, ia dimuatkan ke panel admin; tekan Terbitkan untuk menyimpannya.</div><div class="sec">Sandaran automatik (peranti ini, 3 terakhir)</div>${bl.length ? bl.map((b, i) => `<div class="item"><b>${esc(new Date(b.t).toLocaleString("ms-MY"))}</b> <span class="badge2">${esc(b.l)}</span><div class="arow"><button type="button" class="sb" data-act="rb" data-i="${i}">↩ Pulihkan versi ini</button></div></div>`).join("") : '<p class="hint">Belum ada. Ia dibuat setiap kali anda menekan Terbitkan.</p>'}</div>`; };
+const slugId = v => String(v || "").trim().toLowerCase().replace(/[\s_]+/g, "-");
+const idOk = v => /^[a-z0-9][a-z0-9-]{0,39}$/.test(v);
+function renameId(col, idx, raw) { // tukar id + kemas kini semua rujukan. Pulangkan mesej ralat atau "".
+  const arr = COLS[col].a, it = arr[idx], old = it.id, nv = slugId(raw);
+  if (nv === old) return "";
+  if (!idOk(nv)) return "Id tidak sah. Guna huruf kecil, nombor dan sempang sahaja (maksimum 40 aksara), cth. kad-helocore.";
+  if (arr.some((x, i) => i !== idx && x.id === nv && (col !== "submenus" || x.menuId === it.menuId))) return `Id "${nv}" sudah digunakan.`;
+  const sw = (list, key, kinds) => list.forEach(x => { if (x[key] === old && (!kinds || kinds.includes(x.kind))) x[key] = nv; });
+  if (col === "menus") { [SUBMENUS, FAQ, CONTACTS, NOTICES].forEach(l => sw(l, "menuId")); }
+  else if (col === "forms") sw(SUBMENUS, "ref", ["form"]);
+  else if (col === "templates") sw(FORMS, "template");
+  else if (col === "media") { sw(SUBMENUS, "ref", ["audio", "video", "image", "link"]); sw(NOTICES, "mediaId"); PAGES.forEach(p => (p.blocks || []).forEach(b => { if (b.mediaId === old) b.mediaId = nv; })); }
+  else if (col === "pages") sw(SUBMENUS, "ref", ["page"]);
+  else if (col === "numbers") { sw(TEMPLATES, "recipientId"); if (SETTINGS.defaultNumber === old) SETTINGS.defaultNumber = nv; }
+  if (col === "menus" || col === "submenus") { it.aliases = (it.aliases || []).filter(a => a !== nv); if (!it.aliases.includes(old)) it.aliases.push(old); }
+  it.id = nv; it.updatedAt = today(); return "";
+}
 function tierText(p) {
   const t = (SETTINGS.commission[p] || []).slice().sort((a, b) => a.from - b.from), f = n => "RM" + Number(n).toLocaleString("en-US"), out = [];
   if (!t.length || t[0].from > 0) out.push(`Bawah ${t.length ? f(t[0].from) : "—"}: 0%`);
@@ -698,7 +715,7 @@ function AdminUI() {
         const delKey = A.col + ":" + i;
         h += `<div class="item"><b>${esc(it.title || it.q || it.name || it.id)}</b> <span class="badge2">${esc(it.status || "")}</span><div class="hint">id: ${esc(it.id)}${it.menuId ? " · menu: " + esc(it.menuId) : ""}${A.col === "templates" ? " · penerima: " + esc(recipientOf(it) || "—") : ""} <span id="w${i}" style="color:var(--err)">${A.col === "numbers" && !validWa(it.number) ? "⚠ Format nombor tidak sah" : A.col === "templates" && it.status === "active" && !validWa(recipientOf(it)) ? "⚠ Tiada nombor penerima sah" : A.col === "menus" && it.status === "active" && !menuReady(it) ? "⚠ Dipaparkan sebagai Akan Datang (tiada submenu bersedia)" : A.col === "submenus" && it.status === "active" && !subReady(it) ? "⚠ Dipaparkan sebagai Akan Datang (kandungan belum ada)" : ""}</span></div><div class="arow">${ab("up", i, "↑", "Naik")}${ab("down", i, "↓", "Turun")}${ab("edit", i, "✎ Edit", "Edit")}${A.col === "notices" ? ab("prev", i, "👁 Pratonton", "Pratonton") : ""}${A.del === delKey ? ab("delok", i, "Sahkan padam", "Sahkan padam", "d") : ab("del", i, "🗑", "Padam", "d")}</div>`;
         if (A.i === i) {
-          h += `<div class="panel">` + c.f.map(([k, l, t]) => fi("data-k", k, l, t === "src" ? (it.type === "image" ? "upload" : "") : t, it[k] ?? "")).join("");
+          h += `<div class="panel"><label for="idf">Id (huruf kecil, nombor, sempang)</label><input id="idf" data-idf="1" value="${esc(it.id)}" autocapitalize="off" autocomplete="off" spellcheck="false"><div class="hint">${A.col === "menus" || A.col === "submenus" ? "Id ini ialah alamat halaman. " : ""}Tekan keluar daripada kotak ini untuk menyimpan. Semua rujukan dikemas kini automatik.</div>${A.col === "menus" || A.col === "submenus" ? `<label for="alf">Alias pautan lama (asing dengan koma)</label><input id="alf" data-al="1" value="${esc((it.aliases || []).join(", "))}" autocapitalize="off" autocomplete="off" spellcheck="false"><div class="hint">Pautan lama dengan alias ini membawa pelawat ke halaman semasa. Padam alias jika tidak diperlukan.</div>` : ""}` + c.f.map(([k, l, t]) => fi("data-k", k, l, t === "src" ? (it.type === "image" ? "upload" : "") : t, it[k] ?? "")).join("");
           if (c.fields) {
             h += `<div class="sec">Medan borang</div>`;
             it.fields.forEach((f, k) => {
@@ -757,6 +774,10 @@ function AdminUI() {
   });
   ui.addEventListener("change", async e => {
     const t = e.target;
+    if (t.dataset.idf) {
+      const err = renameId(A.col, A.i, t.value);
+      draw(); const x = $("#am", ui); if (x) x.textContent = err ? "⚠ " + err : "Id disimpan dalam panel. Tekan Terbitkan untuk menyimpannya."; return;
+    }
     if (t.dataset.k === "recipientId" || t.dataset.s === "defaultNumber") { draw(); return; }
     if (t.dataset.restore) {
       const f = t.files[0]; if (!f) return; const m = s => { const x = $("#am", ui); if (x) x.textContent = s; };
@@ -774,7 +795,8 @@ function AdminUI() {
   });
   ui.addEventListener("input", e => {
     const t = e.target;
-    if (t.dataset.restore || t.type === "file") return;
+    if (t.dataset.restore || t.type === "file" || t.dataset.idf) return;
+    if (t.dataset.al) { const it0 = COLS[A.col].a[A.i]; if (it0) it0.aliases = t.value.split(",").map(slugId).filter(Boolean); return; }
     if (t.dataset.ct) { const [p, k, f] = t.dataset.ct.split(":"); SETTINGS.commission[p][+k][f] = parseFloat(t.value) || 0; const d = $("#ctd-" + p, ui); if (d) d.innerHTML = tierText(p); return; }
     if (t.dataset.tk !== undefined) { try { localStorage.setItem("ghtoken", t.value.trim()); } catch (e) {} return; }
     if (t.dataset.sg) { SETTINGS.postage[t.dataset.sg] = parseFloat(t.value) || 0; return; }
@@ -826,10 +848,16 @@ const GUIDE = [
   ["Panel Admin", "Buka <code>#/admin</code> (pemilik/penyunting sahaja). Edit menu, submenu, borang, template, media, FAQ dan hubungi, kemudian tekan <b>Terbitkan perubahan</b> supaya pelawat nampak versi baharu."],
   ["Pemberitahuan imej", "Media → tambah jenis <b>imej</b> dan muat naik gambar. Notis → pilih imej itu, tetapkan popup/banner, halaman sasaran dan tarikh mula/tamat, tekan 👁 untuk pratonton, kemudian Terbitkan. Notis hanya dipapar sekali setiap pelawat; tukar kandungan = dipapar semula."],
   ["Halaman (gambar + penerangan)", "Admin → <b>Halaman</b> → tambah, kemudian tambah blok (gambar, teks, butang, video, audio) dan susun. Tambah media dahulu di tab Media. Kemudian Submenu: jenis <code>page</code>, Rujukan = id halaman, status <code>active</code>."],
+  ["Tukar id", "Admin → ✎ Edit → medan <b>Id</b>. Rujukan dikemas kini automatik. Untuk menu/submenu, id lama disimpan sebagai <b>alias</b> supaya pautan lama masih berfungsi."],
   ["Formula tempahan", "Enjin kiraan ada di <code>CALC</code>. Formula belum ditetapkan, jadi medan bayaran diisi manual."]
 ];
 
 function route() {
+  { const h = (location.hash || "#/").split("/"); // pautan lama (alias) → id semasa
+    if (h[1] === "m" && h[2]) {
+      const m = MENUS.find(x => x.id === h[2]) || MENUS.find(x => (x.aliases || []).includes(h[2]));
+      if (m) { let sid = h[3]; if (sid) { const sb = SUBMENUS.filter(x => x.menuId === m.id), x = sb.find(y => y.id === sid) || sb.find(y => (y.aliases || []).includes(sid)); if (x) sid = x.id; }
+        if (m.id !== h[2] || (h[3] && sid !== h[3])) { location.replace("#/m/" + m.id + (sid ? "/" + sid : "")); return; } } } }
   const app = $("#app"); const [, a, b, c] = (location.hash || "#/").split("/");
   document.querySelectorAll("audio").forEach(x => x.pause()); document.querySelectorAll(".ov").forEach(x => x.remove());
   let html = "", body = el("div", "wrap");
