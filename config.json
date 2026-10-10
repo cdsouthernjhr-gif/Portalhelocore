@@ -1147,9 +1147,9 @@
    "status": "active",
    "sortOrder": 1,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-09",
+   "updatedAt": "2026-10-10",
    "id": "notis",
-   "title": "Promosi oktober",
+   "title": "Promosi oktober pocket saver sedang berlangsung sehingga 30hb oktober 2026.",
    "message": "Jangan segan untuk hubungi saya jika ada persoalan",
    "mediaId": "media-promosi-ejen",
    "display": "banner",
@@ -1157,17 +1157,17 @@
    "mula": "2026-10-06",
    "tamat": "2026-10-30",
    "btnText": "",
-   "btnUrl": "#/m"
+   "btnUrl": "#/m/promosi"
   }
  ],
  "pages": [
   {
    "description": "",
    "icon": "",
-   "status": "draft",
+   "status": "active",
    "sortOrder": 1,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-09",
+   "updatedAt": "2026-10-10",
    "id": "promosi-ejen-teks",
    "title": "PROMOSI OCTOBER",
    "blocks": [
@@ -1182,7 +1182,7 @@
     {
      "type": "button",
      "label": "TEMPAHAN",
-     "url": "#/m/selatan/tempahan-selatan"
+     "url": "#/m/tempahan"
     }
    ]
   }
