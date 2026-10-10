@@ -50,16 +50,17 @@ a.tile:active{animation:ripple .45s}
 .hero .wrap::after{content:"";display:block;clear:both}
 .phonepic{float:right;width:36%;max-width:170px;height:auto;margin:6px 0 4px 14px;filter:drop-shadow(0 0 22px rgba(224,138,30,.5)) drop-shadow(0 10px 14px rgba(0,0,0,.4));transition:filter .3s,transform .3s}
 .hero:hover .phonepic{filter:drop-shadow(0 0 32px rgba(255,170,60,.8)) drop-shadow(0 10px 14px rgba(0,0,0,.4));transform:rotate(-2deg)}
-.ov{position:fixed;inset:0;z-index:50;background:rgba(8,16,24,.72);display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
-.nbox{background:var(--card);color:var(--ink);border-radius:22px;max-width:420px;width:100%;max-height:100%;overflow:auto;padding:16px;box-shadow:0 0 0 2px var(--accent),0 20px 50px rgba(0,0,0,.5);animation:pop .25s ease-out}
-.nbox img,.nban img,.mimg{width:100%;height:auto;display:block;border-radius:14px;margin-bottom:12px}
-.nbox h2,.nban h2{margin:0 0 6px;font-size:20px}
-.nbox p,.nban p{margin:0 0 4px;color:var(--mute)}
-.nban{position:relative;margin-top:16px;background:var(--card);border:1px solid var(--accent);border-left-width:6px;border-radius:16px;padding:14px;box-shadow:0 0 18px rgba(224,138,30,.25)}
-.nban img{max-height:180px;object-fit:cover}
-.nban h2{padding-right:44px}
-.nban .sb{position:absolute;top:6px;right:6px}
-@keyframes pop{from{transform:scale(.96);opacity:0}}
+.mimg{width:100%;height:auto;display:block;border-radius:14px;margin-bottom:12px}
+/* ticker pemberitahuan di header */
+.tick{display:flex;overflow:hidden;margin:-20px -16px 14px;padding:7px 0;background:rgba(224,138,30,.18);border-bottom:1px solid rgba(224,138,30,.35);color:#FFE6BA;font-size:14px;font-weight:600;white-space:nowrap}
+.tick-t{display:flex;width:max-content;animation:tick var(--d,30s) linear infinite}
+.tick-c{display:flex;flex-shrink:0;min-width:100vw;align-items:center}
+.tick:hover .tick-t,.tick:focus-within .tick-t,.tick:active .tick-t{animation-play-state:paused}
+.tick-i{padding:0 1.2em;color:inherit;text-decoration:none}
+a.tick-i{text-decoration:underline;text-underline-offset:3px}
+.tick-i::after{content:"◆";margin-left:2.4em;color:var(--accent);font-size:10px;vertical-align:middle}
+@keyframes tick{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.tick{overflow-x:auto}.tick-t{animation:none}.tick-c[aria-hidden]{display:none}}
 .pg{margin-top:16px}
 .pgt,.pgm{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:12px;box-shadow:0 1px 3px rgba(18,38,58,.08)}
 .pgm{margin-left:0;margin-right:0}
@@ -152,9 +153,7 @@ const MEDIA = [ // jenis: audio | video (YouTube / URL fail). src kosong = belum
   { id: "imej-contoh", type: "image", title: "Imej contoh pemberitahuan", alt: "Imej contoh pemberitahuan Helocore", src: SAMPLE_IMG, status: "draft" }
 ].map(mk);
 const FAQ = [];      // { id, menuId, q, a, status, ... }
-const NOTICES = [
-  { id: "notis-contoh", title: "Notis contoh (draf)", message: "Ini contoh pemberitahuan. Edit tajuk, mesej dan imej, tukar status kepada active, kemudian terbitkan.", mediaId: "imej-contoh", display: "popup", menuId: "", mula: "", tamat: "", btnText: "Buka Aduan Telefon Awam", btnUrl: "#/m/telefon-awam/aduan", status: "draft" }
-].map(mk);  // pemberitahuan: { id, title, message, mediaId, display(popup|banner), menuId, mula, tamat, btnText, btnUrl, status, ... }
+const NOTICES = []; // notis ticker: { id, title (teks), btnUrl (pautan pilihan), menuId (kosong = semua), mula, tamat, status, ... }
 const PAGES = [];    // halaman: { id, title, status, blocks: [{type: image|text|button|video|audio, ...}], ... }
 const CONTACTS = []; // { id, menuId, name, role, phone, status, ... }
 
@@ -519,36 +518,18 @@ const subReady = s => {
   if (s.kind === "contact") return visible(CONTACTS.filter(x => x.menuId === s.menuId)).length > 0;
   return false;
 };
-const menuReady = m => m.status === "active" && visible(SUBMENUS.filter(s => s.menuId === m.id)).some(subReady);
+const pageOf = m => { const p = m.pageId && PAGES.find(x => x.id === m.pageId); return p && p.status === "active" && (p.blocks || []).length ? p : null; };
+const menuReady = m => m.status === "active" && (!!pageOf(m) || visible(SUBMENUS.filter(s => s.menuId === m.id)).some(subReady));
 
 /* ============ PEMBERITAHUAN & IMEJ ============ */
 const okUrl = u => /^(https?:\/\/|#\/|tel:)/.test(u || "");
-const nKey = n => "n:" + n.id + ":" + n.updatedAt;
-const dismissed = n => { try { return localStorage.getItem(nKey(n)) === "1"; } catch (e) { return false; } };
-const dismiss = n => { try { localStorage.setItem(nKey(n), "1"); } catch (e) {} };
-const noticeImg = m => { const r = m && mediaSrc(m.src, "image"); return r && (r.kind === "img" || (r.kind === "file" && r.t === "image")) ? r.url : ""; };
-const noticeBody = n => {
-  const m = MEDIA.find(x => x.id === n.mediaId && x.type === "image" && x.src);
-  const ext = /^https?:/.test(n.btnUrl || "") ? ' target="_blank" rel="noopener"' : "";
-  return `${noticeImg(m) ? `<img src="${esc(noticeImg(m))}" alt="${esc(m.alt || n.title)}">` : ""}<h2>${esc(n.title)}</h2>${n.message ? `<p>${esc(n.message).replace(/\n/g, "<br>")}</p>` : ""}${okUrl(n.btnUrl) ? `<a class="btn" href="${esc(n.btnUrl)}"${ext}>${esc(n.btnText || "Lihat maklumat")}</a>` : ""}`;
-};
-function showNotice(n, preview) {
-  document.querySelectorAll(".ov").forEach(x => x.remove());
-  const ov = el("div", "ov", `<div class="nbox" role="dialog" aria-modal="true" aria-label="${esc(n.title)}">${noticeBody(n)}<button type="button" class="btn alt">Tutup</button></div>`);
-  const onKey = e => { if (e.key === "Escape") close(); };
-  const close = () => { if (!preview) dismiss(n); ov.remove(); document.removeEventListener("keydown", onKey); };
-  $("button", ov).onclick = close; ov.addEventListener("click", e => { if (e.target === ov) close(); });
-  document.addEventListener("keydown", onKey); document.body.append(ov); $("button", ov).focus();
-}
-function Banner(n) {
-  const b = el("div", "nban", noticeBody(n) + '<button type="button" class="sb" aria-label="Tutup pemberitahuan">✕</button>');
-  $("button.sb", b).onclick = () => { dismiss(n); b.remove(); }; return b;
-}
-function applyNotices(menuId, body) {
-  const t = today();
-  const list = NOTICES.filter(n => n.status === "active" && (!n.mula || n.mula <= t) && (!n.tamat || n.tamat >= t) && (!n.menuId || n.menuId === menuId)).sort((x, y) => x.sortOrder - y.sortOrder);
-  list.filter(n => n.display === "banner" && !dismissed(n)).reverse().forEach(n => body.prepend(Banner(n)));
-  const p = list.find(n => n.display !== "banner" && !dismissed(n)); if (p) setTimeout(() => showNotice(p), 500);
+let CUR_MENU = "", PREVIEW_N = null;
+const activeNotices = menuId => { const t = today(); return NOTICES.filter(n => n.status === "active" && (n.title || "").trim() && (!n.mula || n.mula <= t) && (!n.tamat || n.tamat >= t) && (!n.menuId || n.menuId === menuId)).sort((x, y) => x.sortOrder - y.sortOrder); };
+function tickerHTML() {
+  const list = PREVIEW_N ? [PREVIEW_N] : activeNotices(CUR_MENU); if (!list.length) return "";
+  const item = n => okUrl(n.btnUrl) ? `<a class="tick-i" href="${esc(n.btnUrl)}"${/^https?:/.test(n.btnUrl) ? ' target="_blank" rel="noopener"' : ""}>${esc(n.title)}</a>` : `<span class="tick-i">${esc(n.title)}</span>`;
+  const c = list.map(item).join(""), len = list.reduce((a, n) => a + (n.title || "").length + 6, 0), d = Math.max(14, Math.round(len * 0.26));
+  return `<div class="tick" role="region" aria-label="Pemberitahuan" style="--d:${d}s"><div class="tick-t"><div class="tick-c">${c}</div><div class="tick-c" aria-hidden="true">${c}</div></div></div>`;
 }
 const ImageView = m => MediaCard(m, "image", "🖼️");
 const LinkView = m => MediaCard(m, "link", "🔗");
@@ -596,8 +577,8 @@ function toDataUrl(file) {
 /* ============ ⑧ ADMIN PANEL (#/admin) ============ */
 const STATUSES = ["active", "draft", "coming-soon", "hidden"], KINDS = ["form", "page", "audio", "video", "image", "link", "faq", "contact", "content"], FTYPES = ["text", "tel", "date", "textarea", "number", "select"];
 const COLS = {
-  menus: { l: "Menu", a: MENUS, f: [["title", "Tajuk"], ["icon", "Ikon (emoji)"], ["description", "Keterangan"], ["status", "Status", "status"]], n: () => ({ title: "Menu baharu", icon: "📌", status: "draft" }) },
-  submenus: { l: "Submenu", a: SUBMENUS, f: [["menuId", "Menu induk", "menu"], ["title", "Tajuk"], ["icon", "Ikon (emoji)"], ["kind", "Jenis", "kind"], ["ref", "Rujukan (id borang / media)"], ["status", "Status", "status"]], n: () => ({ menuId: MENUS[0] && MENUS[0].id, title: "Submenu baharu", icon: "📌", kind: "content", status: "draft" }) },
+  menus: { l: "Menu", a: MENUS, f: [["title", "Tajuk"], ["icon", "Ikon (emoji)"], ["description", "Keterangan"], ["pageId", "Halaman untuk menu ini (pilihan; dipaparkan di atas submenu)", "pgsel"], ["status", "Status", "status"]], n: () => ({ title: "Menu baharu", icon: "📌", status: "draft" }) },
+  submenus: { l: "Submenu", a: SUBMENUS, f: [["menuId", "Menu induk", "menu"], ["title", "Tajuk"], ["icon", "Ikon (emoji)"], ["kind", "Jenis", "kind"], ["ref", "Rujukan (pilih item)", "ref"], ["status", "Status", "status"]], n: () => ({ menuId: MENUS[0] && MENUS[0].id, title: "Submenu baharu", icon: "📌", kind: "content", status: "draft" }) },
   forms: { l: "Borang", a: FORMS, fields: 1, f: [["title", "Tajuk"], ["description", "Keterangan"], ["template", "Template WhatsApp", "tpl"], ["cta", "Teks butang"], ["note", "Nota"]], n: () => ({ title: "Borang baharu", template: "", fields: [], status: "draft" }) },
   templates: { l: "Template", a: TEMPLATES, f: [["title", "Nama"], ["recipientId", "Nombor penerima (kosong = nombor lalai)", "num0"], ["status", "Status", "status"], ["text", "Teks mesej ({{medan}} / {{?medan}})", "area"]], n: () => ({ title: "Template baharu", recipientId: "", text: "", status: "draft" }) },
   media: { l: "Media", a: MEDIA, f: [["title", "Tajuk"], ["type", "Jenis", "mtype"], ["src", "Sumber (tampal pautan: YouTube, Drive, Dropbox, GitHub, URL fail, atau muat naik imej)", "src"], ["alt", "Teks alternatif imej"], ["status", "Status", "status"]], n: () => ({ title: "Media baharu", type: "audio", src: "" }) },
@@ -605,16 +586,37 @@ const COLS = {
   contacts: { l: "Hubungi", a: CONTACTS, f: [["menuId", "Menu", "menu"], ["name", "Nama"], ["role", "Jawatan"], ["phone", "No. telefon", "tel"], ["status", "Status", "status"]], n: () => ({ menuId: MENUS[0] && MENUS[0].id, name: "Pegawai baharu", role: "", phone: "", status: "draft" }) }
 };
 COLS.pages = { l: "Halaman", a: PAGES, blocks: 1, f: [["title", "Tajuk (untuk rujukan sendiri)"], ["status", "Status", "status"]], n: () => ({ title: "Halaman baharu", status: "draft", blocks: [] }) };
+const REFK = ["form", "page", "audio", "video", "image", "link"];
 const BLK = { image: "🖼 Gambar", text: "📝 Teks", button: "🔘 Butang", video: "▶️ Video", audio: "🎧 Audio" };
 const blkSum = b => b.type === "text" ? (b.text || "").slice(0, 40) : b.type === "button" ? (b.label || "") + " → " + (b.url || "") : (b.mediaId || "(pilih media)");
 COLS.numbers = { l: "Nombor", a: SETTINGS.numbers, f: [["title", "Nama (cth. Aduan, Tempahan)"], ["number", "No. WhatsApp (cth. 0123456789)", "wa"], ["status", "Status", "status"]], n: () => ({ title: "Nombor baharu", number: "", status: "draft" }) };
-COLS.notices = { l: "Notis", a: NOTICES, f: [["title", "Tajuk"], ["message", "Mesej", "area"], ["mediaId", "Imej (dari Media jenis imej)", "mimg"], ["display", "Paparan", "disp"], ["menuId", "Papar pada (kosong = semua)", "menu0"], ["mula", "Mula (pilihan)", "date"], ["tamat", "Tamat (pilihan)", "date"], ["btnText", "Teks butang (pilihan)"], ["btnUrl", "Pautan butang (https://, #/, tel:)"], ["status", "Status", "status"]], n: () => ({ title: "Pemberitahuan baharu", message: "", mediaId: "", display: "popup", menuId: "", mula: "", tamat: "", btnText: "", btnUrl: "", status: "draft" }) };
+COLS.notices = { l: "Notis", a: NOTICES, f: [["title", "Teks notis (satu baris ringkas, bergerak di header)"], ["btnUrl", "Pautan bila ditekan (pilihan)", "dest"], ["menuId", "Papar pada (kosong = semua halaman)", "menu0"], ["mula", "Mula (pilihan)", "date"], ["tamat", "Tamat (pilihan)", "date"], ["status", "Status", "status"]], n: () => ({ title: "", menuId: "", mula: "", tamat: "", btnUrl: "", status: "draft" }) };
 const A = { col: "menus", i: null, fi: null, del: null };
 const move = (a, i, d) => { const j = i + d; if (j >= 0 && j < a.length) [a[i], a[j]] = [a[j], a[i]]; };
 const renum = a => a.forEach((x, i) => { x.sortOrder = i + 1; });
+function destOpts() {
+  const o = [["#/", "🏠 Halaman utama"]];
+  MENUS.filter(m => m.status !== "hidden").forEach(m => {
+    o.push([`#/m/${m.id}`, `📁 ${m.title}`]);
+    SUBMENUS.filter(x => x.menuId === m.id && x.status !== "hidden").forEach(x => o.push([`#/m/${m.id}/${x.id}`, `   ↳ ${m.title} › ${x.title}${subReady(x) ? "" : " (belum bersedia)"}`]));
+  });
+  return o;
+}
+function destSelect(cur) {
+  const o = destOpts(), known = o.some(([v]) => v === cur), id = "d" + Math.random().toString(36).slice(2, 7);
+  return `<label for="${id}">Pergi ke (pilih halaman dalam portal)</label><select id="${id}" data-dest="1"><option value="__c" ${known ? "" : "selected"}>${known || !cur ? "— pilih destinasi —" : "Pautan lain (ditaip di bawah)"}</option>${o.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
+}
 function fi(attr, key, label, type, val) {
+  if (type === "dest") return destSelect(val) + fi(attr, key, "Atau taip pautan sendiri (https://, tel:, https://wa.me/…)", "", val);
   const id = "a" + Math.random().toString(36).slice(2, 8);
-  const opts = { status: STATUSES, kind: KINDS, menu: MENUS.map(m => m.id), tpl: ["", ...TEMPLATES.map(t => t.id)], ftype: FTYPES, mtype: ["audio", "video", "image", "link"], num: numOpts(), evt: [["normal", "Normal"], ["promosi", "Promosi"]], num0: [["", "(guna nombor lalai)"], ...numOpts()], mimg: ["", ...MEDIA.filter(m => m.type === "image").map(m => m.id)], mvideo: ["", ...MEDIA.filter(m => m.type === "video").map(m => m.id)], maudio: ["", ...MEDIA.filter(m => m.type === "audio").map(m => m.id)], disp: ["popup", "banner"], menu0: ["", ...MENUS.map(m => m.id)] }[type];
+  const opts = { status: STATUSES, kind: KINDS, menu: MENUS.map(m => m.id), tpl: ["", ...TEMPLATES.map(t => t.id)], ftype: FTYPES, mtype: ["audio", "video", "image", "link"], num: numOpts(), evt: [["normal", "Normal"], ["promosi", "Promosi"]], num0: [["", "(guna nombor lalai)"], ...numOpts()], mimg: ["", ...MEDIA.filter(m => m.type === "image").map(m => m.id)], mvideo: ["", ...MEDIA.filter(m => m.type === "video").map(m => m.id)], maudio: ["", ...MEDIA.filter(m => m.type === "audio").map(m => m.id)], disp: ["popup", "banner"], menu0: ["", ...MENUS.map(m => m.id)],
+    pgsel: [["", "(tiada halaman)"], ...PAGES.map(p => [p.id, `${p.title} (${p.status})`])],
+    refform: [["", "— pilih borang —"], ...FORMS.map(f => [f.id, f.title])],
+    refpage: [["", "— pilih halaman —"], ...PAGES.map(p => [p.id, `${p.title} (${p.status})`])],
+    refaudio: [["", "— pilih audio —"], ...MEDIA.filter(m => m.type === "audio").map(m => [m.id, m.title])],
+    refvideo: [["", "— pilih video —"], ...MEDIA.filter(m => m.type === "video").map(m => [m.id, m.title])],
+    refimage: [["", "— pilih imej —"], ...MEDIA.filter(m => m.type === "image").map(m => [m.id, m.title])],
+    reflink: [["", "— pilih pautan —"], ...MEDIA.filter(m => m.type === "link").map(m => [m.id, m.title])] }[type];
   let c;
   if (opts) c = `<select id="${id}" ${attr}="${key}">${opts.map(o => { const [v, l] = Array.isArray(o) ? o : [o, o]; return `<option value="${esc(v)}" ${v === val ? "selected" : ""}>${esc(l)}</option>`; }).join("")}</select>`;
   else if (type === "area") c = `<textarea id="${id}" ${attr}="${key}" rows="8">${esc(val)}</textarea>`;
@@ -640,7 +642,7 @@ async function publishGithub(msg) {
       if (g.ok) sha = (await g.json()).sha; else if (g.status !== 404) { msg(g.status === 401 || g.status === 403 ? noAuth : "Gagal membaca repo (" + g.status + ")."); return; }
       const p = await fetch(api, { method: "PUT", headers: { ...h, "Content-Type": "application/json" }, body: JSON.stringify({ message: "Kemas kini konfigurasi dari panel admin", content: body, ...(sha ? { sha } : {}) }) });
       if (p.ok) { msg("Disimpan ke GitHub. Perubahan kelihatan dalam 1–2 minit."); return; }
-      if (p.status !== 409 && p.status !== 422) { msg(p.status === 401 || p.status === 403 ? noAuth : "Gagal menyimpan (" + p.status + ")."); return; }
+      if (p.status !== 409 && p.status !== 422) { let d = ""; try { d = (await p.json()).message || ""; } catch (e) {} msg(p.status === 401 || p.status === 403 ? noAuth : "Gagal menyimpan (" + p.status + (d ? ": " + d : "") + ")."); return; }
     }
     msg("Gagal menyimpan: konflik. Cuba lagi.");
   } catch (e) { msg("Gagal menyambung ke GitHub. Semak sambungan internet."); }
@@ -690,8 +692,15 @@ function renameId(col, idx, raw) { // tukar id + kemas kini semua rujukan. Pulan
   else if (col === "forms") sw(SUBMENUS, "ref", ["form"]);
   else if (col === "templates") sw(FORMS, "template");
   else if (col === "media") { sw(SUBMENUS, "ref", ["audio", "video", "image", "link"]); sw(NOTICES, "mediaId"); PAGES.forEach(p => (p.blocks || []).forEach(b => { if (b.mediaId === old) b.mediaId = nv; })); }
-  else if (col === "pages") sw(SUBMENUS, "ref", ["page"]);
+  else if (col === "pages") { sw(SUBMENUS, "ref", ["page"]); sw(MENUS, "pageId"); }
   else if (col === "numbers") { sw(TEMPLATES, "recipientId"); if (SETTINGS.defaultNumber === old) SETTINGS.defaultNumber = nv; }
+  if (col === "menus" || col === "submenus") {
+    const fix = u => { if (typeof u !== "string") return u; const p = u.split("/"); if (p[0] !== "#" || p[1] !== "m") return u;
+      if (col === "menus" && p[2] === old) { p[2] = nv; return p.join("/"); }
+      if (col === "submenus" && p[2] === it.menuId && p[3] === old) { p[3] = nv; return p.join("/"); } return u; };
+    PAGES.forEach(pg => (pg.blocks || []).forEach(b => { if (b.type === "button") b.url = fix(b.url); }));
+    NOTICES.forEach(n => { n.btnUrl = fix(n.btnUrl); });
+  }
   if (col === "menus" || col === "submenus") { it.aliases = (it.aliases || []).filter(a => a !== nv); if (!it.aliases.includes(old)) it.aliases.push(old); }
   it.id = nv; it.updatedAt = today(); return "";
 }
@@ -715,7 +724,7 @@ function AdminUI() {
         const delKey = A.col + ":" + i;
         h += `<div class="item"><b>${esc(it.title || it.q || it.name || it.id)}</b> <span class="badge2">${esc(it.status || "")}</span><div class="hint">id: ${esc(it.id)}${it.menuId ? " · menu: " + esc(it.menuId) : ""}${A.col === "templates" ? " · penerima: " + esc(recipientOf(it) || "—") : ""} <span id="w${i}" style="color:var(--err)">${A.col === "numbers" && !validWa(it.number) ? "⚠ Format nombor tidak sah" : A.col === "templates" && it.status === "active" && !validWa(recipientOf(it)) ? "⚠ Tiada nombor penerima sah" : A.col === "menus" && it.status === "active" && !menuReady(it) ? "⚠ Dipaparkan sebagai Akan Datang (tiada submenu bersedia)" : A.col === "submenus" && it.status === "active" && !subReady(it) ? "⚠ Dipaparkan sebagai Akan Datang (kandungan belum ada)" : ""}</span></div><div class="arow">${ab("up", i, "↑", "Naik")}${ab("down", i, "↓", "Turun")}${ab("edit", i, "✎ Edit", "Edit")}${A.col === "notices" ? ab("prev", i, "👁 Pratonton", "Pratonton") : ""}${A.del === delKey ? ab("delok", i, "Sahkan padam", "Sahkan padam", "d") : ab("del", i, "🗑", "Padam", "d")}</div>`;
         if (A.i === i) {
-          h += `<div class="panel"><label for="idf">Id (huruf kecil, nombor, sempang)</label><input id="idf" data-idf="1" value="${esc(it.id)}" autocapitalize="off" autocomplete="off" spellcheck="false"><div class="hint">${A.col === "menus" || A.col === "submenus" ? "Id ini ialah alamat halaman. " : ""}Tekan keluar daripada kotak ini untuk menyimpan. Semua rujukan dikemas kini automatik.</div>${A.col === "menus" || A.col === "submenus" ? `<label for="alf">Alias pautan lama (asing dengan koma)</label><input id="alf" data-al="1" value="${esc((it.aliases || []).join(", "))}" autocapitalize="off" autocomplete="off" spellcheck="false"><div class="hint">Pautan lama dengan alias ini membawa pelawat ke halaman semasa. Padam alias jika tidak diperlukan.</div>` : ""}` + c.f.map(([k, l, t]) => fi("data-k", k, l, t === "src" ? (it.type === "image" ? "upload" : "") : t, it[k] ?? "")).join("");
+          h += `<div class="panel"><label for="idf">Id (huruf kecil, nombor, sempang)</label><input id="idf" data-idf="1" value="${esc(it.id)}" autocapitalize="off" autocomplete="off" spellcheck="false"><div class="hint">${A.col === "menus" || A.col === "submenus" ? "Id ini ialah alamat halaman. " : ""}Tekan keluar daripada kotak ini untuk menyimpan. Semua rujukan dikemas kini automatik.</div>${A.col === "menus" || A.col === "submenus" ? `<label for="alf">Alias pautan lama (asing dengan koma)</label><input id="alf" data-al="1" value="${esc((it.aliases || []).join(", "))}" autocapitalize="off" autocomplete="off" spellcheck="false"><div class="hint">Pautan lama dengan alias ini membawa pelawat ke halaman semasa. Padam alias jika tidak diperlukan.</div>` : ""}` + c.f.map(([k, l, t]) => t === "ref" ? (REFK.includes(it.kind) ? fi("data-k", k, l, "ref" + it.kind, it[k] ?? "") : "") : fi("data-k", k, l, t === "src" ? (it.type === "image" ? "upload" : "") : t, it[k] ?? "")).join("");
           if (c.fields) {
             h += `<div class="sec">Medan borang</div>`;
             it.fields.forEach((f, k) => {
@@ -730,7 +739,7 @@ function AdminUI() {
             if (!it.blocks.length) h += `<p class="hint">Belum ada blok. Tambah gambar, teks atau butang di bawah.</p>`;
             it.blocks.forEach((b, k) => {
               h += `<div class="item"><b>${BLK[b.type] || b.type}</b> <span class="badge2">${esc(blkSum(b))}</span><div class="arow">${ab("fup", i, "↑", "Naik", "", k)}${ab("fdown", i, "↓", "Turun", "", k)}${ab("fedit", i, "✎", "Edit blok", "", k)}${A.del === "f" + k ? ab("fdelok", i, "Sahkan", "Sahkan padam", "d", k) : ab("fdel", i, "🗑", "Padam blok", "d", k)}</div>`;
-              if (A.fi === k) h += `<div class="panel">` + (b.type === "text" ? fi("data-fk", "text", "Teks (baris kosong = perenggan; ## sub-tajuk; - senarai; 1. senarai bernombor; **tebal**)", "area", b.text || "") : b.type === "button" ? fi("data-fk", "label", "Teks butang", "", b.label || "") + fi("data-fk", "url", "Pautan (https://, #/, tel:)", "", b.url || "") : fi("data-fk", "mediaId", "Media (tambah dahulu di tab Media)", { image: "mimg", video: "mvideo", audio: "maudio" }[b.type], b.mediaId || "") + (b.type === "image" ? fi("data-fk", "caption", "Kapsyen (pilihan)", "", b.caption || "") : "")) + `</div>`;
+              if (A.fi === k) h += `<div class="panel">` + (b.type === "text" ? fi("data-fk", "text", "Teks (baris kosong = perenggan; ## sub-tajuk; - senarai; 1. senarai bernombor; **tebal**)", "area", b.text || "") : b.type === "button" ? fi("data-fk", "label", "Teks butang", "", b.label || "") + destSelect(b.url || "") + fi("data-fk", "url", "Atau taip pautan sendiri (https://, tel:, https://wa.me/…)", "", b.url || "") : fi("data-fk", "mediaId", "Media (tambah dahulu di tab Media)", { image: "mimg", video: "mvideo", audio: "maudio" }[b.type], b.mediaId || "") + (b.type === "image" ? fi("data-fk", "caption", "Kapsyen (pilihan)", "", b.caption || "") : "")) + `</div>`;
               h += `</div>`;
             });
             h += `<div class="arow">${Object.keys(BLK).map(t => `<button type="button" class="sb" style="padding:0 10px" data-act="addb" data-i="${i}" data-v="${t}">+ ${BLK[t]}</button>`).join("")}</div>`;
@@ -754,7 +763,7 @@ function AdminUI() {
     else if (act === "add") { c.a.push(mk({ id: "x" + Date.now().toString(36), ...c.n() }, c.a.length)); A.i = c.a.length - 1; A.fi = null; }
     else if (act === "edit") { A.i = A.i === ix ? null : ix; A.fi = null; }
     else if (act === "up" || act === "down") { move(c.a, ix, act === "up" ? -1 : 1); renum(c.a); A.i = null; }
-    else if (act === "prev") { showNotice(c.a[ix], true); return; }
+    else if (act === "prev") { PREVIEW_N = c.a[ix]; const hd = $(".hero"), old = $(".tick"); if (old) old.remove(); if (hd) hd.insertAdjacentHTML("afterbegin", tickerHTML()); PREVIEW_N = null; const x = $("#am", ui); if (x) x.textContent = "Pratonton ticker di header (abaikan status dan tarikh)."; window.scrollTo(0, 0); return; }
     else if (act === "del") A.del = A.col + ":" + ix;
     else if (act === "delok") { c.a.splice(ix, 1); renum(c.a); A.del = A.i = null; }
     else if (act === "addf" || act === "adds") { const fl = c.a[ix].fields; fl.push(act === "adds" ? { section: "Bahagian baharu" } : { name: "medan" + (fl.length + 1), label: "Medan baharu", type: "text", required: false }); A.fi = fl.length - 1; }
@@ -774,6 +783,12 @@ function AdminUI() {
   });
   ui.addEventListener("change", async e => {
     const t = e.target;
+    if (t.dataset.dest) {
+      if (A.col === "notices") { const nn = NOTICES[A.i]; if (nn && t.value !== "__c") { nn.btnUrl = t.value; nn.updatedAt = today(); draw(); } return; }
+      const blk = (COLS[A.col].a[A.i] || {}).blocks; if (blk && blk[A.fi] && t.value !== "__c") { blk[A.fi].url = t.value; draw(); }
+      return;
+    }
+    if (t.dataset.k === "kind") { const it0 = COLS[A.col].a[A.i]; if (it0) { it0.ref = ""; draw(); } return; }
     if (t.dataset.idf) {
       const err = renameId(A.col, A.i, t.value);
       draw(); const x = $("#am", ui); if (x) x.textContent = err ? "⚠ " + err : "Id disimpan dalam panel. Tekan Terbitkan untuk menyimpannya."; return;
@@ -795,7 +810,7 @@ function AdminUI() {
   });
   ui.addEventListener("input", e => {
     const t = e.target;
-    if (t.dataset.restore || t.type === "file" || t.dataset.idf) return;
+    if (t.dataset.restore || t.type === "file" || t.dataset.idf || t.dataset.dest) return;
     if (t.dataset.al) { const it0 = COLS[A.col].a[A.i]; if (it0) it0.aliases = t.value.split(",").map(slugId).filter(Boolean); return; }
     if (t.dataset.ct) { const [p, k, f] = t.dataset.ct.split(":"); SETTINGS.commission[p][+k][f] = parseFloat(t.value) || 0; const d = $("#ctd-" + p, ui); if (d) d.innerHTML = tierText(p); return; }
     if (t.dataset.tk !== undefined) { try { localStorage.setItem("ghtoken", t.value.trim()); } catch (e) {} return; }
@@ -832,7 +847,7 @@ function AdminPage() {
 /* ============ ⑦ PAGES & ROUTER (hash — butang Back/Forward & refresh berfungsi) ============ */
 const meta = (t, d) => { document.title = t; $('meta[name="description"]').content = d; $('meta[property="og:title"]').content = t; $('meta[property="og:description"]').content = d; };
 const LOGOS = [["data:image/webp;base64,UklGRm4JAABXRUJQVlA4IGIJAABQLQCdASptAEAAPjEUiEKiISEXanaoIAMEsgBpMeP9V4tPYbwrkxfN/+y+6rtAeYB+nn9t6kXmG/Xz/S/3T3uvQ7/tfUI/s3+G6w/0AP2A9Mr9rvgw/av91/Z+zRT+V+enu/+3fjh55+EHyN63/tPpE/yP7Sfcf7D+wX7nf7noJ+C2gr/Kf61+QW4V0Afjf86/tX5Yf3P0HP1X8gPdD5a/VN/R/7f+WXNJeRewB/LP61/ofzA/1XxX/4/+S/Mb2xflX+C/4v+Q/dn6CP5N/Rf9T/c/8Z/3f7v///FH+4Hs0/tm5ztD7lPEAhDFcr2vdA1FAy6QJ/q7ArDCHUG5L8tABOn/YKv1Tzh9sdv8RHutAR5HnmRa69iigTFM9D5SnALT1Qfqsmmq5ZtrXf/+m8Wjv3Zj+qxu0pQHHoYtVY/3EITvaCH4rg0ZdTof1ycaxZxxgix8h9jXmabf3ZCLRRP2Gs+pnpIVkbvNwBDH0hlnnM5XAAD+/3yF1vg9QKczHC+z1P/rgHnK6gmVWkgic3pVB1GiflBPgAH4T3mbM1zs24xLx2erAP0t2y98SItPJOy/c/zuUYEQLZeeMAEES/ULtKGcPqlzRn6z/c52RCpZH5JT/87d2YLt2G3SKwy5icYyixBjCn2hSM4eWYKf0K8OycXrDv+qV69ZvTFSxVsahuRLKpxexXambhrHeIwIWTLa8GeSu8qYBELxlE59ixKRighddQ+fW+VdS6y3bO0aQHKWfRypIV2OQlgBr2CAc8qp4Mvn7LNvvs00kGsgrDkrDNlGAF6/idu1cWcbsIYUxIVpG/efkYDk06dntv/93fJsOZlePxmY+scSc+A/PZNQSeucYVJpJqBMCbcogujSNI0aCY2TyXWzjik9EZG9HUZomtreu886EMcIe68EKYgs5THJOvgt6ReFzgeXozLbD+vjRVyNTbqcESgcZQhaBVrz1XbwbhSN7jmBGZuiY7hO3exd3x8kkkow9TpaEDEwUWxfbeuMFE8m/tYfDUOSdXv1ZSvmZiEEkdLCegzY58O9AKiJWT7LhdfIUra3D6ZaKDnnV19txL+e88DPfK6fVVIjCzptrqgk2AN2B7DPOexoV+9uADfBD1d11aLg6/PCjcvMy8p1VEpaiKcnYDE/JrRitRAtNIWHtkBf5uh7Tz7S/Ff7TbwH3K9FB9DKeaCHtFSDCbebyLPsl32or7/vh75W+BsPvpfNShN01Qf9/Mby2Q81ggCm+jLJLUOrEU65KEAJeibPFtX8ZEr/M4uMbdeZYDEsq/VvTM0f0twniBfoWBpTpPrG3RM4xSbT65LSMZ2JMTyMD+qUMDlsj9VOqIdbDvtSeRLFZvtWIngm6L5rt3+NQm38M4RjmeBLLQq7MEDVdCnhAm61M1KJMuC+z0fFAFf6/2T0bZzHFinEunRuxgxHUF/78dvTHo2sqK6lxqsYcDYuoX39r4tcmX4qnbF0DqLoZVzO3o92wrh+M9IfcX/uPIBbW5+c3tnfu3XKvtCNbzRK9zYE7tgxM0btC9CXvx+XN3WJUSX3drDztgDC+JhHzWWIj77LrTL1ra9pE0/QX6j4fbx0llUJFbtPC8xWLuIV0bsiQ0rQ72j45ZTwKOLTYOXCewWQQrsC16B8Wljqwh0GRmKob5V1BNngw0go4/K5TkN984PV+WIpxsW7xctn29+NJ7oHj2Vnj2HVi3h+pF5snDwLzxF4+tsc8atdEFSey0rWoZC6uOWNkL4y1T2zKgZ1RlwDvHM/S9qsiauG0mK3flNSMiyJE7oT/SPokPBNo7EG9QAO0Y1m9CEvC5wQEtV5X67Fof724SF+W1IKylP7SskeAt0X1SIAB8GHkWznMVnOB/+i4alhROKe//DQ9XRpg53Sxd9AhRzfbmupV1H0SWtQVn10LyRfAczn4JUBF36cgbQa/Zas5vYThRp0ZbBc/WscPrOKvM4H/x3U3VZHWlpX5S5M7m51/ecQrwxfEddCv3ks2oqr8aEXEtOmUEFIlHyiIC+M5ttYWgzJVUNXTcD4aPBEmIHNe6z0xCgGLAP/qpc4iTA1GpPIV0LfzqRECs6qaUHY3QqqXAyGNW5qvz/Qfo5snPiJzSWyGJaYJx232tYCt7u37MLQTwCvVvcrUY5bEVWFA/+ymPH4ougcUWFUw8HfYXj4i100Cevg9GEKITy/9HmriXlpribEmmMnGW6HbEaWDZwzTCLpa1zX8MCT/JocuUYLmjIMsfzIpZHp6WjMbN6w24ON19/JH2wkVI1diuKzyMGOastNQK5Wa1ylMxP62AlbZuBoCKFNt+WEE+O6gP+Q6u3N9p01rFjEzpd0nMMx4b6r43WBamn+VVT/sv1v/xFf06ctSdmEDtgVnb8L+l7/H/4TT9uyHQKU45j0aopSs1g/+ErW+pXJ1+kb1Lwb3XmTqv4jXmOXpNnK4NlqmcnzolVR6Yv6jf/41Ype3AhAIr9oAI4SKZApTM+eSZoVqPRpTUlF3+IpSOrVXvGz+JDvu13RI5G1BCRSB34xJoHJTBptomKtqQTI3OJPdiAGXnzP/+rO77d9+/RmGoHd4ePvvL7I8ATwOzPB2Vn2FSFJgGgh6PjTjbOnSfGaadwHPk+dKawo8qCT+biHqLH4RoiqOHjMkhFlWtYz+dxxfR97g47fPLWPSqkBKT/+g9eq22VGunfFz5Y1cCimwN7u3kjXA3xb4/LBdNnrut/g+6ULI4Pit5jyqh3hoYuDJRU7ITVoDc9iXM8cl5mjxQeTkR8V6ufzhAi8Q8aZCo8g/KR4+xjuJxEzGse5ODXSD6momP/S5p9TMoq5YGewdnq9ytJ+hUh80rA503dCyeR8GvReWzl+6E/4YNsYfCgFT4K0NBFOF83UE0tNcjfpbJwCTr4CQ00Fg/6N/obqkzUN7aAWuBGJ7c5jrr/0jogIaVGIQ5hF8YD1nZX2D/UW3x/PInBegYwDb/QYADkmwmF5zWpWpq3wYxpMp45sA5rEWkAqgSnmyayYpjKofW72gEgA85IIFFSqZaCnPXIoMuA1KnAl7R1GjM8Majv0R/AtV23XsE+g0LzYvUSehObBxMWjKUYdZ/JB2Yq4ybtj9aaW+CadCKrNdklrJbCQuSaku3/jvNVBXnqELzxPmFPnlUDDedG8Lc/NvrVE9JBADoO1apotM6fYy+XwbKubYgxZa2NPZYT8XhIAAA==", 109, 64, "Logo Helocore"], ["data:image/webp;base64,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", 85, 64, "Logo Helogang"], ["data:image/webp;base64,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", 69, 64, "Logo Helodotcom"], ["data:image/webp;base64,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", 199, 64, "Logo MyPelajar"]]; // [src, lebar, tinggi, alt] — susunan paparan
-const Hero = (back, title, sub, extra = "", pre = "") => `<header class="hero"><div class="wrap"><div class="top"><a class="brand" href="#/" aria-label="${SETTINGS.brand} — menu utama">${SETTINGS.brand}</a><div class="logos">${LOGOS.map(l => `<img src="${l[0]}" width="${l[1]}" height="${l[2]}" alt="${l[3]}">`).join("")}</div></div>${back ? `<a class="back" href="${back}">← Kembali</a>` : ""}${pre}<h1>${esc(title)}</h1>${sub ? `<p>${esc(sub)}</p>` : ""}${extra}</div></header>`;
+const Hero = (back, title, sub, extra = "", pre = "") => `<header class="hero">${tickerHTML()}<div class="wrap"><div class="top"><a class="brand" href="#/" aria-label="${SETTINGS.brand} — menu utama">${SETTINGS.brand}</a><div class="logos">${LOGOS.map(l => `<img src="${l[0]}" width="${l[1]}" height="${l[2]}" alt="${l[3]}">`).join("")}</div></div>${back ? `<a class="back" href="${back}">← Kembali</a>` : ""}${pre}<h1>${esc(title)}</h1>${sub ? `<p>${esc(sub)}</p>` : ""}${extra}</div></header>`;
 const PHONE_SVG = `<svg viewBox="0 0 120 150" width="96" role="img" aria-label="Ilustrasi telefon awam" style="margin-top:16px"><rect x="22" y="8" width="76" height="134" rx="14" fill="#F5B63B"/><rect x="34" y="22" width="52" height="30" rx="6" fill="#12263A"/><rect x="34" y="62" width="52" height="46" rx="6" fill="#0B7A70"/><circle cx="46" cy="76" r="4" fill="#fff"/><circle cx="60" cy="76" r="4" fill="#fff"/><circle cx="74" cy="76" r="4" fill="#fff"/><circle cx="46" cy="92" r="4" fill="#fff"/><circle cx="60" cy="92" r="4" fill="#fff"/><circle cx="74" cy="92" r="4" fill="#fff"/><rect x="48" y="118" width="24" height="6" rx="3" fill="#12263A"/></svg>`;
 
 const GUIDE = [
@@ -846,8 +861,9 @@ const GUIDE = [
   ["H. Audio / video / imej / pautan", "Admin → Media → tampal pautan perkongsian: YouTube, Vimeo, Google Drive, Dropbox, GitHub atau URL fail (.mp3 .mp4 .jpg …). Hos lain (4shared, OneDrive, MediaFire) dibuka sebagai butang pautan. Jenis <b>pautan</b> memaparkan butang Buka untuk sebarang URL. Kemudian tetapkan submenu (jenis sama) dan status <code>active</code>."],
   ["I. Deploy", "Muat naik fail ini ke Netlify Drop, Vercel, Cloudflare Pages atau GitHub Pages. Kongsi pautan di WhatsApp. Isi <code>og:image</code> dengan URL gambar sebenar."],
   ["Panel Admin", "Buka <code>#/admin</code> (pemilik/penyunting sahaja). Edit menu, submenu, borang, template, media, FAQ dan hubungi, kemudian tekan <b>Terbitkan perubahan</b> supaya pelawat nampak versi baharu."],
-  ["Pemberitahuan imej", "Media → tambah jenis <b>imej</b> dan muat naik gambar. Notis → pilih imej itu, tetapkan popup/banner, halaman sasaran dan tarikh mula/tamat, tekan 👁 untuk pratonton, kemudian Terbitkan. Notis hanya dipapar sekali setiap pelawat; tukar kandungan = dipapar semula."],
+  ["Notis (teks bergerak di header)", "Admin → <b>Notis</b> → tambah. Isi <b>Teks notis</b> (satu baris ringkas), pautan pilihan, halaman sasaran, tarikh mula/tamat dan status <code>active</code>. Beberapa notis aktif bergerak berturut-turut. Tekan 👁 untuk pratonton, kemudian Terbitkan."],
   ["Halaman (gambar + penerangan)", "Admin → <b>Halaman</b> → tambah, kemudian tambah blok (gambar, teks, butang, video, audio) dan susun. Tambah media dahulu di tab Media. Kemudian Submenu: jenis <code>page</code>, Rujukan = id halaman, status <code>active</code>."],
+  ["Halaman pada menu atau submenu", "Menu: Admin → Menu → ✎ → <b>Halaman untuk menu ini</b> (halaman dipaparkan di atas submenu, atau sendirian jika tiada submenu). Submenu: jenis <code>page</code> dan pilih halaman dalam Rujukan. Butang dalam halaman: pilih destinasi daripada senarai <b>Pergi ke</b>."],
   ["Tukar id", "Admin → ✎ Edit → medan <b>Id</b>. Rujukan dikemas kini automatik. Untuk menu/submenu, id lama disimpan sebagai <b>alias</b> supaya pautan lama masih berfungsi."],
   ["Formula tempahan", "Enjin kiraan ada di <code>CALC</code>. Formula belum ditetapkan, jadi medan bayaran diisi manual."]
 ];
@@ -859,7 +875,8 @@ function route() {
       if (m) { let sid = h[3]; if (sid) { const sb = SUBMENUS.filter(x => x.menuId === m.id), x = sb.find(y => y.id === sid) || sb.find(y => (y.aliases || []).includes(sid)); if (x) sid = x.id; }
         if (m.id !== h[2] || (h[3] && sid !== h[3])) { location.replace("#/m/" + m.id + (sid ? "/" + sid : "")); return; } } } }
   const app = $("#app"); const [, a, b, c] = (location.hash || "#/").split("/");
-  document.querySelectorAll("audio").forEach(x => x.pause()); document.querySelectorAll(".ov").forEach(x => x.remove());
+  document.querySelectorAll("audio").forEach(x => x.pause());
+  CUR_MENU = a === "m" ? b : ""; PREVIEW_N = null;
   let html = "", body = el("div", "wrap");
   const footer = `<div class="foot">${SETTINGS.brand} · <a href="#/panduan">Panduan</a> · <a href="#/admin">Admin</a></div>`;
   if (!a) {
@@ -873,7 +890,10 @@ function route() {
       html = Hero("#/", `${m.icon} ${m.title}`, m.id === "telefon-awam" ? "Lapor kerosakan, semak panduan dan dapatkan bantuan dengan cepat." : m.description, m.id === "telefon-awam" && !m.image ? PHONE_SVG : "", m.hero && m.image ? `<img class="phonepic" src="${m.image}" width="520" height="707" alt="Telefon awam Helocore berwarna oren dengan paparan biru dan pembaca kad hijau">` : "");
       if (m.image && !m.hero) body.append(CardShot(m));
       if (!menuReady(m)) body.append(Empty("Kandungan akan datang."));
-      else { const g = el("div", "grid"); subs.forEach(s => g.append(Tile(`#/m/${b}/${s.id}`, s.icon, s.title, "", !subReady(s)))); body.append(g); }
+      else {
+        const pg = pageOf(m); if (pg) body.append(PageView(pg));
+        if (subs.length) { const g = el("div", "grid"); subs.forEach(s => g.append(Tile(`#/m/${b}/${s.id}`, s.icon, s.title, "", !subReady(s)))); body.append(g); }
+      }
     } else {
       const s = subs.find(x => x.id === c);
       if (!s || !subReady(s)) { html = Hero(`#/m/${b}`, "Akan Datang", "Halaman ini belum tersedia."); body.append(Empty("Kandungan sedang disediakan.")); meta("Akan Datang — Helocore", "Kandungan sedang disediakan."); }
@@ -906,7 +926,6 @@ function route() {
   }
   body.insertAdjacentHTML("beforeend", footer);
   app.innerHTML = html; app.append(body); window.scrollTo(0, 0);
-  if (!a || a === "m") applyNotices(a ? b : "", body);
 }
 document.addEventListener("pointermove", e => { const t = e.target.closest && e.target.closest(".hero,.tile"); if (!t) return; const r = t.getBoundingClientRect(); t.style.setProperty("--mx", (e.clientX - r.left) + "px"); t.style.setProperty("--my", (e.clientY - r.top) + "px"); }, { passive: true });
 document.addEventListener("pointermove", e => { const f = e.target.closest && e.target.closest(".cardshot"); if (!f) return; const r = f.getBoundingClientRect(); f.style.setProperty("--ry", ((e.clientX - r.left) / r.width - .5) * 14 + "deg"); f.style.setProperty("--rx", -((e.clientY - r.top) / r.height - .5) * 14 + "deg"); }, { passive: true });
