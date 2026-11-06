@@ -13,10 +13,20 @@
    "hero": true
   },
   {
+   "description": "Maklumat & bantuan",
+   "icon": "🎓",
+   "status": "active",
+   "sortOrder": 2,
+   "createdAt": "2026-10-03",
+   "updatedAt": "2026-10-07",
+   "id": "mypelajar",
+   "title": "MyPelajar"
+  },
+  {
    "description": "Aduan kad hilang / rosak",
    "icon": "💳",
    "status": "active",
-   "sortOrder": 2,
+   "sortOrder": 3,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-03",
    "id": "kad",
@@ -27,7 +37,7 @@
    "description": "Cara beli & topup kredit",
    "icon": "💰",
    "status": "active",
-   "sortOrder": 3,
+   "sortOrder": 4,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-07",
    "id": "topup",
@@ -37,7 +47,7 @@
    "description": "Borang tempahan",
    "icon": "📦",
    "status": "active",
-   "sortOrder": 4,
+   "sortOrder": 5,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-03",
    "id": "tempahan",
@@ -47,7 +57,7 @@
    "description": "Daftar Ejen Dan Lantik Ejen",
    "icon": "🗣",
    "status": "active",
-   "sortOrder": 5,
+   "sortOrder": 6,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-10-09",
    "id": "ejen",
@@ -55,16 +65,6 @@
    "aliases": [
     "xmuw51ilt"
    ]
-  },
-  {
-   "description": "Maklumat & bantuan",
-   "icon": "🎓",
-   "status": "active",
-   "sortOrder": 6,
-   "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-07",
-   "id": "mypelajar",
-   "title": "MyPelajar"
   },
   {
    "description": "8hb okt 2026  sehingga 30hb okt 2026.  Sedang berlangsung",
@@ -249,10 +249,10 @@
   {
    "description": "",
    "icon": "📣 Promosi - Ejen",
-   "status": "active",
+   "status": "hidden",
    "sortOrder": 13,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-09",
+   "updatedAt": "2026-11-06",
    "id": "promosi-ejen",
    "menuId": "promosi",
    "title": "Promosi - ejen",
@@ -265,10 +265,10 @@
   {
    "description": "",
    "icon": "📣 Promosi - Pelajar",
-   "status": "active",
+   "status": "hidden",
    "sortOrder": 14,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-10-09",
+   "updatedAt": "2026-11-06",
    "id": "promosi-pelajar",
    "menuId": "promosi",
    "title": "Promosi - pelajar",
