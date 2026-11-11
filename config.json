@@ -355,12 +355,12 @@
   {
    "description": "",
    "icon": "💰",
-   "status": "draft",
+   "status": "active",
    "sortOrder": 20,
    "createdAt": "2026-10-03",
    "updatedAt": "2026-11-12",
    "id": "komisyen-tiers",
-   "menuId": "telefon-awam",
+   "menuId": "tempahan",
    "title": "Komisyen Normal",
    "kind": "image",
    "aliases": [
