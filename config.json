@@ -697,10 +697,10 @@
   },
   {
    "id": "aduan-kad",
-   "recipientId": "sm-selatan",
+   "recipientId": "careline",
    "status": "active",
    "text": "📢 ADUAN KAD HELOCORE ROSAK / HILANG\n\nBagi memudahkan proses pemindahan baki atau sekatan (block) kad:\n\n📅 Tarikh: {{tarikh}}\n👤 Nama Pelajar: {{pelajar}}\n🆔 No. Kad Lama: {{kadLama}}\n💳 No. Kad Baharu: {{?kadBaru}}\n🙋 Nama Pengadu: {{pengadu}}\n📱 No. Telefon Pengadu: {{telefon}}\n🏫 Nama Sekolah: {{sekolah}}\n📝 Jenis Aduan: {{jenis}}",
-   "updatedAt": "2026-10-07"
+   "updatedAt": "2026-11-12"
   },
   {
    "id": "tempahan-selatan",
