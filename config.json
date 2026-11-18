@@ -1175,7 +1175,7 @@
    "status": "active",
    "sortOrder": 1,
    "createdAt": "2026-10-03",
-   "updatedAt": "2026-11-12",
+   "updatedAt": "2026-11-18",
    "id": "notis",
    "title": "Komisyen aktif mengikut tiers,beli banyak dapat banyak.klik sini untuk maklumat lanjut",
    "message": "Jangan segan untuk hubungi saya jika ada persoalan",
@@ -1185,7 +1185,7 @@
    "mula": "2026-10-06",
    "tamat": "2026-12-31",
    "btnText": "",
-   "btnUrl": "#/m/telefon-awam/komisyen-tiers"
+   "btnUrl": "#/m/tempahan/komisyen-tiers"
   }
  ],
  "pages": [
