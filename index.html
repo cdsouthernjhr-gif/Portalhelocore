@@ -444,8 +444,8 @@ function FormRenderer(form) {
     }
     summary.hidden = true;
     const to = recipientOf(tpl), okTo = validWa(to), url = okTo ? waUrl(to, msg) : "";
-    let w = null; if (okTo) { try { w = window.open(url, "_blank"); if (w) w.opener = null; } catch (e) {} }
-    actions.innerHTML = `${okTo ? `<div class="ok" role="status">${w ? "WhatsApp dibuka. Tekan Hantar di WhatsApp." : "Tekan butang di bawah untuk membuka WhatsApp."}</div><a class="btn wa" target="_blank" rel="noopener" href="${url}">📲 Buka WhatsApp</a>` : '<div class="summary">Nombor penerima belum ditetapkan. Sila guna Salin Mesej.</div>'}<button type="button" class="btn alt" id="cp">📋 Salin Mesej</button><div class="ok" id="cpm" role="status"></div>`;
+    let w = null; if (okTo && form.pdf !== "1") { try { w = window.open(url, "_blank"); if (w) w.opener = null; } catch (e) {} }
+    actions.innerHTML = `${okTo ? `<div class="ok" role="status">${w ? "WhatsApp dibuka. Tekan Hantar di WhatsApp." : form.pdf === "1" ? "Maklumat sedia. Sila pilih salah satu di bawah." : "Tekan butang di bawah untuk membuka WhatsApp."}</div><a class="btn wa" target="_blank" rel="noopener" href="${url}">📲 Buka WhatsApp</a>` : '<div class="summary">Nombor penerima belum ditetapkan. Sila guna Salin Mesej.</div>'}<button type="button" class="btn alt" id="cp">📋 Salin Mesej</button><div class="ok" id="cpm" role="status"></div>`;
     pv.hidden = false;
     $("#cp", actions).onclick = async () => { $("#cpm", actions).textContent = (await copyText(msg)) ? "Mesej disalin." : "Gagal menyalin mesej."; };
     if (form.pdf === "1") {
