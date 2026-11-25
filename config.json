@@ -367,6 +367,19 @@
     "xmwcr8q1k"
    ],
    "ref": "komisyen-tiers"
+  },
+  {
+   "description": "Lampiran 1 – Surat Perlantikan Ejen Jualan Helocore",
+   "icon": "📝",
+   "status": "active",
+   "createdAt": "2026-11-25",
+   "updatedAt": "2026-11-25",
+   "sortOrder": 21,
+   "menuId": "ejen",
+   "id": "pengakuan",
+   "title": "Pengakuan Penerimaan Perlantikan",
+   "kind": "form",
+   "ref": "pengakuan-ejen"
   }
  ],
  "forms": [
@@ -685,6 +698,103 @@
     }
    ],
    "cta": "SUBMIT"
+  },
+  {
+   "description": "Saya/Kami dengan ini bersetuju menerima perlantikan sebagai Ejen Jualan Helocore dan bersetuju untuk mematuhi segala terma dan syarat yang telah ditetapkan oleh pihak Helodotcom Sdn. Bhd.",
+   "icon": "",
+   "status": "active",
+   "createdAt": "2026-11-25",
+   "updatedAt": "2026-11-25",
+   "sortOrder": 5,
+   "id": "pengakuan-ejen",
+   "title": "Pengakuan Penerimaan Perlantikan",
+   "category": "ejen",
+   "template": "pengakuan-ejen",
+   "fields": [
+    {
+     "section": "A. Maklumat Ejen / Koperasi"
+    },
+    {
+     "name": "sekolah",
+     "label": "Nama Sekolah / Kod",
+     "type": "text",
+     "required": true
+    },
+    {
+     "name": "ejen",
+     "label": "Nama Ejen / Koperasi",
+     "type": "text",
+     "required": true
+    },
+    {
+     "name": "wakil",
+     "label": "Nama Wakil",
+     "type": "text",
+     "required": true
+    },
+    {
+     "name": "kp",
+     "label": "No. Kad Pengenalan",
+     "type": "text",
+     "required": true
+    },
+    {
+     "name": "telefon",
+     "label": "No. Telefon Wakil",
+     "type": "tel",
+     "required": true
+    },
+    {
+     "section": "B. Pilihan Kaedah Tambah Nilai"
+    },
+    {
+     "name": "kaedah",
+     "label": "Kaedah tambah nilai yang ingin digunakan",
+     "type": "tickbox",
+     "required": true,
+     "options": [
+      "Kad RFID Helocore",
+      "Baucar Helocore",
+      "Aplikasi Helocore",
+      "Semua Kaedah"
+     ],
+     "hint": "Sila tandakan (✓) pada kaedah yang ingin digunakan. Boleh pilih lebih daripada satu."
+    },
+    {
+     "section": "C. Pengesahan dan Persetujuan",
+     "note": "Saya/Kami mengesahkan bahawa maklumat yang diberikan adalah benar dan bersetuju dengan pelantikan serta terma dan syarat yang telah ditetapkan oleh pihak Helodotcom Sdn. Bhd."
+    },
+    {
+     "name": "tandatangan",
+     "label": "Tandatangan",
+     "type": "text",
+     "required": true,
+     "hint": "Taip nama penuh anda sebagai tandatangan."
+    },
+    {
+     "name": "nama",
+     "label": "Nama",
+     "type": "text",
+     "required": true
+    },
+    {
+     "name": "cop",
+     "label": "Cop Rasmi (jika berkaitan)",
+     "type": "text",
+     "required": false,
+     "hint": "Taip nama atau butiran cop rasmi. Kosongkan jika tiada."
+    },
+    {
+     "name": "tarikh",
+     "label": "Tarikh",
+     "type": "date",
+     "required": true,
+     "autoFillToday": true
+    }
+   ],
+   "cta": "SUBMIT",
+   "pdf": "1",
+   "pdfHead": "LAMPIRAN 1"
   }
  ],
  "templates": [
@@ -721,6 +831,15 @@
    "title": "Pertukaran Ejen Lama Ke Ejen Baru",
    "recipientId": "sm-selatan",
    "text": "#PERTUKARAN EJEN LAMA KE EJEN BARU\n\nMaklumat Ejen Lama\n🗓TARIKH:{{tarikh}}\n🏫SEKOLAH:{{sekolah}}\n👨‍🏫NAMA:{{nama}}\n📧EMAIL:{{email}}\n☎️NO TELEFON:{{telefon}}\n\n\nMaklumat Ejen Baru\n👨‍🏫NAMA:{{nama1}}\n📧EMAIL:{{email1}}\n☎️NO TELEFON:{{telefon}}"
+  },
+  {
+   "id": "pengakuan-ejen",
+   "recipientId": "sm-selatan",
+   "status": "active",
+   "title": "Pengakuan penerimaan perlantikan ejen",
+   "createdAt": "2026-11-25",
+   "updatedAt": "2026-11-25",
+   "text": "📝 PENGAKUAN PENERIMAAN PERLANTIKAN EJEN JUALAN HELOCORE\n(Lampiran 1 – Surat Perlantikan Ejen Jualan Helocore)\n\nSaya/Kami dengan ini bersetuju menerima perlantikan sebagai Ejen Jualan Helocore dan bersetuju untuk mematuhi segala terma dan syarat yang telah ditetapkan oleh pihak Helodotcom Sdn. Bhd.\n\n*A. Maklumat Ejen / Koperasi*\nNAMA SEKOLAH / KOD: {{sekolah}}\nNAMA EJEN / KOPERASI: {{ejen}}\nNAMA WAKIL: {{wakil}}\nNO. KAD PENGENALAN: {{kp}}\nNO. TELEFON WAKIL: {{telefon}}\n\n*B. Pilihan Kaedah Tambah Nilai*\n{{kaedah}}\n\n*C. Pengesahan dan Persetujuan*\nSaya/Kami mengesahkan bahawa maklumat yang diberikan adalah benar dan bersetuju dengan pelantikan serta terma dan syarat yang telah ditetapkan oleh pihak Helodotcom Sdn. Bhd.\n\nTANDATANGAN: {{tandatangan}}\nNAMA: {{nama}}\nCOP RASMI: {{?cop}}\nTARIKH: {{tarikh}}"
   }
  ],
  "media": [
